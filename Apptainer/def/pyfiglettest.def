@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/pytorch:22.11-py3
+
+%labels
+    Author: DGX2 Test
+    Version: 1.0
+    Description: Einfacher Test-Container für den DGX‑2 mit zusätzlichem Nischen-Package
+
+%post
+    echo "Aktualisiere Paketliste und installiere Abhängigkeiten..."
+    apt-get update && apt-get install -y git wget
+    echo "Upgrade pip..."
+    pip install --upgrade pip
+    echo "Installation der zusätzlichen Python-Pakete: pyfiglet..."
+    pip install pyfiglet
+    echo "Post-Installation abgeschlossen."
+
+%runscript
+    echo "Starte DGX‑2 Test-Container..."
+    exec python3 -c "import torch; import pyfiglet; \
+print(pyfiglet.figlet_format('DGX2 Test')); \
+print('CUDA device count:', torch.cuda.device_count())"

@@ -1,0 +1,17 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/pytorch:22.11-py3
+
+%labels
+    Author Qwen Team
+    Version 1.0
+    Description Container for running the QwQ-32B LLM from Hugging Face
+
+%post
+    echo "System-Updates und Installation von Abhängigkeiten..."
+    apt-get update && apt-get install -y git wget
+    echo "Upgrade pip..."
+    pip install --upgrade pip
+    echo "Installation der benötigten Python-Pakete: transformers und accelerate..."
+    pip install transformers accelerate
+    # Optional: Weitere Pakete installieren, z.B. sentencepiece, tokenizers etc.
+    echo "Installation abgeschlossen."
