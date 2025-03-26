@@ -1,17 +1,47 @@
+# .def file for creating an apptainer container that installs the required dependencies
+# aswell as the QwQ32B model into /mnt/data/tim.mazhari/qwq32b
+# Create the .sif file on a amd64 processor due to incompatabilities with arm64.
+
 Bootstrap: docker
 From: nvcr.io/nvidia/pytorch:22.11-py3
 
 %labels
-    Author Qwen Team
-    Version 1.0
-    Description Container for running the QwQ-32B LLM from Hugging Face
+    Author: Qwen Team
+    Version: 1.0
+    Description: Container for running QwQ-32B LLM on the DGX‑2; model is installed at runtime if not already present
 
 %post
-    echo "System-Updates und Installation von Abhängigkeiten..."
+
+
+    echo "Updating package lists and installing dependencies..."
     apt-get update && apt-get install -y git wget
-    echo "Upgrade pip..."
+    echo "Upgrading pip..."
     pip install --upgrade pip
-    echo "Installation der benötigten Python-Pakete: transformers und accelerate..."
+    echo "Installing required Python packages: transformers and accelerate..."
     pip install transformers accelerate
-    # Optional: Weitere Pakete installieren, z.B. sentencepiece, tokenizers etc.
-    echo "Installation abgeschlossen."
+    echo "Creating persistent directories in /mnt/data/tim.mazhari..."
+    mkdir -p /mnt/data/tim.mazhari/qwq32b
+    mkdir -p /mnt/data/tim.mazhari/models/transformers_cache
+    mkdir -p /mnt/data/tim.mazhari/models/huggingface
+    echo "Build completed: Container built without model installation."
+
+%environment
+    export TRANSFORMERS_CACHE=/mnt/data/tim.mazhari/models/transformers_cache
+    export HF_HOME=/mnt/data/tim.mazhari/models/huggingface
+
+%runscript
+    echo "Starting QwQ‑32B container..."
+    echo "Checking if QwQ‑32B model is already installed in /mnt/data/tim.mazhari/qwq32b..."
+    if [ -d "/mnt/data/tim.mazhari/qwq32b" ] && [ "$(ls -A /mnt/data/tim.mazhari/qwq32b)" ]; then
+        echo "Model directory exists and is not empty. Skipping model installation."
+    else
+        echo "Model directory is empty or does not exist. Installing QwQ‑32B model now..."
+        python3 -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
+tokenizer = AutoTokenizer.from_pretrained('Qwen/QwQ-32B'); \
+model = AutoModelForCausalLM.from_pretrained('Qwen/QwQ-32B'); \
+model.save_pretrained('/mnt/data/tim.mazhari/qwq32b'); \
+tokenizer.save_pretrained('/mnt/data/tim.mazhari/qwq32b'); \
+print('QwQ‑32B model installed at runtime.')"  
+    fi
+    echo "Starting interactive shell..."
+    exec /bin/bash
