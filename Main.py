@@ -13,12 +13,12 @@ class LLMClientGUI:
         master.title("DGX-2 LLM Client")
         
         # Konfiguration
-        self.prompt = "Von wo kommt der Nachname Touro?"
+        self.prompt = "Wie heisst der Gründer der Migros Genossenschaft? "
         self.ssh_host = "sx-el-121920.ost.ch"
         self.ssh_user = "tim.mazhari"
         self.ssh_key_path = ""
         self.container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
-        self.model_path = "/mnt/data/tim.mazhari/qwq32b"
+        self.model_path = "/mnt/data/tim.mazhari/models/qwq32b"
         
         # GUI Layout
         self.setup_gui()
@@ -238,7 +238,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
 model = AutoModelForCausalLM.from_pretrained(
     model_path,
     local_files_only=True,
-#    torch_dtype=torch.bfloat16,
+    torch_dtype=torch.bfloat16,
     device_map="auto"
 ).eval()
 
