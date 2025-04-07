@@ -4,10 +4,11 @@ from threading import Thread
 import queue
 import os
 import time
-
-# Importiere die SSH-Verbindung und Prompt-Ausführungsfunktion
 from ssh_connection import SSHConnection
 from prompt_executor import execute_prompt
+from prompt_executor import start_server
+from prompt_executor import check_server_status
+
 
 class LLMClientGUI:
     def __init__(self, master):
@@ -22,68 +23,59 @@ class LLMClientGUI:
         self.container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
         self.model_path = "/mnt/data/tim.mazhari/models/qwq32b"
         
-        # GUI Layout
         self.setup_gui()
-        
-        # Queue für Thread-Kommunikation
         self.output_queue = queue.Queue()
         self.master.after(100, self.process_queue)
-        
-        # RAG-Konfiguration
         self.rag_ssh_enabled = False
         self.uploaded_pdfs = []
-    
+        
+        # Serverstatus initialisieren
+        self.server_status = "not running"
+
     def setup_gui(self):
-        # Notebook für Tabs
         self.notebook = ttk.Notebook(self.master)
         self.notebook.pack(fill=tk.BOTH, expand=True)
         
-        # SSH Tab
         self.ssh_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.ssh_tab, text="DGX-2 SSH")
-        
-        # SSH GUI Elemente
         self.setup_ssh_tab()
-        
-        # Status Bar
-        self.status_var = tk.StringVar()
-        self.status_var.set("Bereit")
+
+        # Status Bars
+        self.status_var = tk.StringVar(value="Bereit")
         self.status_bar = tk.Label(self.master, textvariable=self.status_var, relief=tk.SUNKEN)
         self.status_bar.pack(fill=tk.X)
 
+        self.server_status_var = tk.StringVar(value="Server Status: checking...")
+        ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
+        ssh_conn.connect()
+        self.server_status, error = check_server_status(ssh_conn, self.container_path)
+        if "running" == self.server_status:
+            self.server_status_var.set("Server Status: running")
+        else:
+            self.server_status_var.set("Server Status: not running")
+        ssh_conn.close()
 
-        self.server_status_label = tk.Label(self.master, text="Server Status: Unbekannt", relief=tk.RAISED)
+        self.server_status_label = tk.Label(self.master, textvariable=self.server_status_var, relief=tk.RAISED)
         self.server_status_label.pack(fill=tk.X)
-        
-        # Queue für Thread-Kommunikation
-        self.server_status = "Server läuft nicht"
-        self.server_status_label.config(text="Server läuft nicht")
-        self.output_queue = queue.Queue()
-        self.master.after(100, self.process_queue)
-        self.check_server_status()
-    
+
     def setup_ssh_tab(self):
-        # SSH Eingabe
         tk.Label(self.ssh_tab, text="SSH Anfrage:").pack()
         self.ssh_input = tk.Text(self.ssh_tab, height=5, width=80)
         self.ssh_input.insert("1.0", self.prompt)
         self.ssh_input.pack()
         
-        # SSH Buttons
         tk.Button(self.ssh_tab, text="Anfrage senden", command=self.send_ssh_request).pack()
         
-        # SSH Ausgabe
         tk.Label(self.ssh_tab, text="Antwort:").pack()
         self.ssh_output = scrolledtext.ScrolledText(self.ssh_tab, height=20, width=80, state='disabled')
         self.ssh_output.pack()
 
-        # RAG-Controls für SSH hinzufügen
         rag_frame = ttk.Frame(self.ssh_tab)
         rag_frame.pack(fill=tk.X, pady=5)
 
         ttk.Button(rag_frame, 
-                   text="PDF hochladen (DGX-2)", 
-                   command=self.upload_pdf_to_dgx).pack(side=tk.LEFT, padx=5)
+                 text="PDF hochladen (DGX-2)", 
+                 command=self.upload_pdf_to_dgx).pack(side=tk.LEFT, padx=5)
         
         self.rag_ssh_toggle = ttk.Button(
             rag_frame,
@@ -94,6 +86,7 @@ class LLMClientGUI:
         
         self.pdf_list_ssh = tk.Listbox(rag_frame, height=3, width=50)
         self.pdf_list_ssh.pack(side=tk.LEFT, padx=5)
+
     
     def upload_pdf_to_dgx(self):
         filepath = filedialog.askopenfilename(filetypes=[("PDF Files", "*.pdf")])
@@ -183,59 +176,53 @@ print(\\\"PDF_SUCCESS\\\")
         self.master.after(100, self.process_queue)
     
 
-    def check_server_status(self, first_run=False):
-        if first_run:
-            self.server_status = "Server wird gestartet..."
-            self.server_status_label.config(text="Server wird gestartet...")
-            return
-        else:
-            try:
-                ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
-                ssh_conn.connect()
-                # Prüfe den Serverstatus in der Apptainer-Instanz
-                cmd = "APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 apptainer exec instance://llm_instance nc -z localhost 5000 && echo 'running' || echo 'not running'"
-                status, error = ssh_conn.run_command(cmd)
-        
-                if "running" == status:
-                    self.server_status_label.config(text="Server läuft")
-                    self.server_status = "Server läuft"
-                    
-                ssh_conn.close()
-            except Exception as e:
-                self.server_status_label.config(text=f"Fehler beim Status: {str(e)}")
-            self.master.after(5000, self.check_server_status)
-            return status
-
-
     def send_ssh_request(self):
         prompt = self.ssh_input.get("1.0", tk.END).strip()
         if not prompt:
             return
-        self.output_queue.put(("status", "Verbinde mit DGX-2..."))
         Thread(target=self._execute_ssh_query, args=(prompt,), daemon=True).start()
     
     def _execute_ssh_query(self, query):
+        # Serverstatus prüfen und ggf. starten
+        if self.server_status != "running":
+            self.server_status_var.set("Server Status: starting...")
+            self.output_queue.put(("status", "Server starting..."))
+            
 
-        if self.server_status != "Server läuft":
-            self.check_server_status(first_run=True)
+            # Anfrage senden
+            try:
+                self.output_queue.put(("ssh", f">>> Ihre Anfrage: {query}"))
+                ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
+                ssh_conn.connect()
+                
+                start_server(ssh_conn=ssh_conn, container_path=self.container_path)                   
+                self.server_status, error = check_server_status(ssh_conn, self.container_path)
+                if "running" == self.server_status:
+                    self.server_status_var.set("Server Status: running")
+                else:
+                    self.server_status_var.set("Server Status: not running")
 
+                ssh_conn.close()
+        
+            except Exception as e:
+                self.output_queue.put(("ssh", f"SSH Fehler: {str(e)}"))
+                self.output_queue.put(("status", "Verbindungsfehler"))
+                self.server_status_var.set("Server konnte nicht gestartet werden.")
 
+            # Anfrage senden
         try:
             self.output_queue.put(("ssh", f">>> Ihre Anfrage: {query}"))
-
             ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
             ssh_conn.connect()
-            self.output_queue.put(("status", "SSH Verbunden"))
-            time.sleep(1)
+            
             self.output_queue.put(("status", "Frage LLM ab..."))
-            output, error = execute_prompt(ssh_conn, query, self.container_path, self.model_path, self.rag_ssh_enabled)
-            self.check_server_status()
-
+            output, error = execute_prompt(ssh_conn, query)
+            
             if error:
                 self.output_queue.put(("ssh", f"Fehler: {error}"))
             if output:
                 self.output_queue.put(("ssh", f"<<< LLM Antwort:\n{output}"))
-    
+            
             self.output_queue.put(("status", "Antwort empfangen"))
             ssh_conn.close()
         except Exception as e:
