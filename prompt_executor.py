@@ -1,20 +1,11 @@
 import time
 
-def execute_prompt(ssh_conn, query, container_path, model_path, rag_enabled):
-    """
-    Führt den Prompt aus, indem er die Anfrage an den persistenten LLM-Server weiterleitet.
-    
-    Falls die Apptainer-Instanz oder der LLM-Server (auf Port 5000) noch nicht läuft, werden
-    diese automatisch gestartet. Dabei wird sichergestellt, dass nur die GPUs 0, 1 und 2 genutzt werden.
-    
-    Hinweis: Ersetze '/pfad/zu/llm_server.py' durch den tatsächlichen Pfad von llm_server.py
-    innerhalb der Instanz.
-    """
-    # Escape einfache Anführungszeichen in der Query
-    escaped_query = query.replace("'", "'\\''")
-    
-    instance_name = "llm_instance"
-    
+instance_name = "llm_instance"
+container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
+model_path = "/mnt/data/tim.mazhari/models/qwq32b"
+
+
+def check_server_status (ssh_conn):
     # Prüfe, ob die Apptainer-Instanz bereits läuft
     check_instance_command = f"apptainer instance list | grep {instance_name}"
     instance_output, instance_error = ssh_conn.run_command(check_instance_command)
@@ -28,7 +19,11 @@ def execute_prompt(ssh_conn, query, container_path, model_path, rag_enabled):
     # Prüfe, ob der LLM-Server auf Port 5000 läuft – ausführen innerhalb der Instanz
     check_server_command = f"apptainer exec instance://{instance_name} nc -z localhost 5000 && echo 'running' || echo 'not running'"
     server_status, server_error = ssh_conn.run_command(check_server_command)
-    if "not running" in server_status:
+    return server_status, server_error
+
+def start_server(ssh_conn):
+    
+    if "not running" in check_server_status(ssh_conn):
         # Starte den LLM-Server innerhalb der Instanz (im Hintergrund mit nohup)
         start_server_command = f"APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 apptainer exec instance://{instance_name} nohup python3 /home/tim.mazhari/llm_server.py > /home/tim.mazhari/llm_server.log 2>&1 &"
         ssh_conn.run_command(start_server_command)
@@ -43,7 +38,26 @@ def execute_prompt(ssh_conn, query, container_path, model_path, rag_enabled):
                 break
             time.sleep(poll_interval)
             elapsed += poll_interval
+        if ready_status == "ready":
+            return True
+        else: 
+            return False
+    else:
+        return True
+
+def execute_prompt(ssh_conn, query):
+    """
+    Führt den Prompt aus, indem er die Anfrage an den persistenten LLM-Server weiterleitet.
     
+    Falls die Apptainer-Instanz oder der LLM-Server (auf Port 5000) noch nicht läuft, werden
+    diese automatisch gestartet. Dabei wird sichergestellt, dass nur die GPUs 0, 1 und 2 genutzt werden.
+    
+    Hinweis: Ersetze '/pfad/zu/llm_server.py' durch den tatsächlichen Pfad von llm_server.py
+    innerhalb der Instanz.
+    """
+    # Escape einfache Anführungszeichen in der Query
+    escaped_query = query.replace("'", "'\\''")
+        
     # Sende die Anfrage an den LLM-Server – führe den netcat-Befehl innerhalb der Instanz aus
     cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 apptainer exec instance://{instance_name} bash -c \"echo '{escaped_query}' | nc localhost 5000\""
     output, error = ssh_conn.run_command(cmd)

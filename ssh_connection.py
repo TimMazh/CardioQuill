@@ -2,11 +2,11 @@ import paramiko
 import os
 
 class SSHConnection:
-    def __init__(self, host, user, key_path=""):
-        self.host = host
-        self.user = user
-        self.key_path = key_path
+    def __init__(self):
         self.client = None
+        self.host = "sx-el-121920.ost.ch"
+        self.user = "tim.mazhari"
+        self.key_path = "REMOVED"
 
     def connect(self):
         self.client = paramiko.SSHClient()
