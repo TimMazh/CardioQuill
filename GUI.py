@@ -17,12 +17,8 @@ class LLMClientGUI:
         
         # Konfiguration
         self.prompt = "Wer ist der Schweizer Nationalheld?"
-        self.ssh_host = "sx-el-121920.ost.ch"
-        self.ssh_user = "tim.mazhari"
-        self.ssh_key_path = ""
-        self.container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
-        self.model_path = "/mnt/data/tim.mazhari/models/qwq32b"
         
+                
         self.setup_gui()
         self.output_queue = queue.Queue()
         self.master.after(100, self.process_queue)
@@ -46,9 +42,9 @@ class LLMClientGUI:
         self.status_bar.pack(fill=tk.X)
 
         self.server_status_var = tk.StringVar(value="Server Status: checking...")
-        ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
+        ssh_conn = SSHConnection()
         ssh_conn.connect()
-        self.server_status, error = check_server_status(ssh_conn, self.container_path)
+        self.server_status, error = check_server_status(ssh_conn)
         if "running" == self.server_status:
             self.server_status_var.set("Server Status: running")
         else:
@@ -97,7 +93,7 @@ class LLMClientGUI:
     
     def _process_remote_pdf(self, filepath):
         try:
-            ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
+            ssh_conn = SSHConnection()
             ssh_conn.connect()
             self.output_queue.put(("status", "Verbunden mit DGX-2"))
     
@@ -191,15 +187,16 @@ print(\\\"PDF_SUCCESS\\\")
 
             # Anfrage senden
             try:
-                self.output_queue.put(("ssh", f">>> Ihre Anfrage: {query}"))
-                ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
+                self.output_queue.put(("ssh", f">>> Überprüfe Serverstatus"))
+                ssh_conn = SSHConnection()
                 ssh_conn.connect()
                 
-                start_server(ssh_conn=ssh_conn, container_path=self.container_path)                   
-                self.server_status, error = check_server_status(ssh_conn, self.container_path)
+                start_server(ssh_conn=ssh_conn)                   
+                self.server_status, error = check_server_status(ssh_conn)
                 if "running" == self.server_status:
                     self.server_status_var.set("Server Status: running")
                 else:
+                    self.output_queue.put(("ssh", f">>> Starte Server"))
                     self.server_status_var.set("Server Status: not running")
 
                 ssh_conn.close()
@@ -212,7 +209,7 @@ print(\\\"PDF_SUCCESS\\\")
             # Anfrage senden
         try:
             self.output_queue.put(("ssh", f">>> Ihre Anfrage: {query}"))
-            ssh_conn = SSHConnection(self.ssh_host, self.ssh_user, self.ssh_key_path)
+            ssh_conn = SSHConnection()
             ssh_conn.connect()
             
             self.output_queue.put(("status", "Frage LLM ab..."))

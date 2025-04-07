@@ -1,9 +1,11 @@
 import time
 
 instance_name = "llm_instance"
+container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
+model_path = "/mnt/data/tim.mazhari/models/qwq32b"
 
 
-def check_server_status (ssh_conn, container_path):
+def check_server_status (ssh_conn):
     # Prüfe, ob die Apptainer-Instanz bereits läuft
     check_instance_command = f"apptainer instance list | grep {instance_name}"
     instance_output, instance_error = ssh_conn.run_command(check_instance_command)
@@ -19,9 +21,9 @@ def check_server_status (ssh_conn, container_path):
     server_status, server_error = ssh_conn.run_command(check_server_command)
     return server_status, server_error
 
-def start_server(ssh_conn, container_path):
+def start_server(ssh_conn):
     
-    if "not running" in check_server_status(ssh_conn, container_path):
+    if "not running" in check_server_status(ssh_conn):
         # Starte den LLM-Server innerhalb der Instanz (im Hintergrund mit nohup)
         start_server_command = f"APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 apptainer exec instance://{instance_name} nohup python3 /home/tim.mazhari/llm_server.py > /home/tim.mazhari/llm_server.log 2>&1 &"
         ssh_conn.run_command(start_server_command)
