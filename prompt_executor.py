@@ -3,7 +3,7 @@ import time
 instance_name = "llm_instance"
 container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
 model_path = "/mnt/data/tim.mazhari/models/qwq32b"
-GPUs="0,1,2"
+GPUs="13,14,15"
 
 
 def check_server_status (ssh_conn):
