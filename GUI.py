@@ -5,9 +5,7 @@ import queue
 import os
 import time
 from ssh_connection import SSHConnection
-from prompt_executor import execute_prompt
-from prompt_executor import start_server
-from prompt_executor import check_server_status
+from prompt_executor import *
 
 
 class LLMClientGUI:
@@ -18,7 +16,6 @@ class LLMClientGUI:
         # Konfiguration
         self.prompt = "Wer ist der Schweizer Nationalheld?"
         
-                
         self.setup_gui()
         self.output_queue = queue.Queue()
         self.master.after(100, self.process_queue)
@@ -99,44 +96,10 @@ class LLMClientGUI:
     
             remote_dir = "/mnt/data/tim.mazhari/rag/rag_docs/"
             remote_pdf = remote_dir + os.path.basename(filepath)
-    
-            ssh_conn.run_command(f"mkdir -p {remote_dir}")
-            self.output_queue.put(("status", "RAG Verzeichnis erstellt"))
-    
-            ssh_conn.upload_file(filepath, remote_pdf)
-            self.output_queue.put(("status", "Dokument Hochgeladen"))
-    
-            process_cmd = f"""export APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 && apptainer exec --nv {self.container_path} python3 -c '
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-import os
 
-pdf_path = \\\"{remote_pdf}\\\"
-index_dir = \\\"/mnt/data/tim.mazhari/rag/rag_index\\\"
-print(\\\"testtest\\\")
-loader = PyPDFLoader(pdf_path)
-splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-docs = loader.load_and_split(splitter)
-
-embeddings = HuggingFaceEmbeddings(
-    model_name=\\\"/mnt/data/tim.mazhari/models/sentence-transformers/all-mpnet-base-v2\\\",
-    model_kwargs={{\\\"device\\\": \\\"cuda\\\"}}
-)
-
-if os.path.exists(index_dir):
-    vectorstore = FAISS.load_local(index_dir, embeddings, allow_dangerous_deserialization=True)
-    vectorstore.add_documents(docs)
-else:
-    vectorstore = FAISS.from_documents(docs, embeddings, allow_dangerous_deserialization=True)
-
-vectorstore.save_local(index_dir)
-print(\\\"PDF_SUCCESS\\\")
-"""
             self.output_queue.put(("status", "Dokument Splitten..."))
-            output, error = ssh_conn.run_command(process_cmd)
-    
+            output, error = process_pdf(ssh_conn, remote_pdf, remote_dir, filepath)
+            
             if "PDF_SUCCESS" in output:
                 self.uploaded_pdfs.append(remote_pdf)
                 self.pdf_list_ssh.insert(tk.END, os.path.basename(filepath))
@@ -213,6 +176,8 @@ print(\\\"PDF_SUCCESS\\\")
             ssh_conn.connect()
             
             self.output_queue.put(("status", "Frage LLM ab..."))
+            if self.rag_ssh_enabled:
+                query = query + "_USE_RAG_"
             output, error = execute_prompt(ssh_conn, query)
             
             if error:

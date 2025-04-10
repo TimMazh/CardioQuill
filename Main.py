@@ -260,7 +260,7 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 print(f"\\n\\n[Generation time: {{generation_time:.2f}}s]")
     """
             # Container starten und Code ausführen
-            command = f"export APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 && apptainer exec --nv {self.container_path} python3 -c \"{python_code.replace('\"', '\\\"')}\""
+            #command = f"export APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 && apptainer exec --nv {self.container_path} python3 -c \"{python_code.replace('\"', '\\\"')}\""
             
             stdin, stdout, stderr = ssh.exec_command(command)
             
