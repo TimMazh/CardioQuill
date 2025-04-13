@@ -134,6 +134,8 @@ else:
 vectorstore.save_local(index_dir)
 print(\\\"PDF_SUCCESS\\\")
 """
+            process_cmd = process_cmd.replace('"', '\\"')
+
             self.output_queue.put(("status", "Dokument Splitten..."))
             output, error = ssh_conn.run_command(process_cmd)
     
