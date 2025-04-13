@@ -97,6 +97,29 @@ class LLMClientGUI:
             remote_dir = "/mnt/data/tim.mazhari/rag/rag_docs/"
             remote_pdf = remote_dir + os.path.basename(filepath)
 
+pdf_path = \\\"{remote_pdf}\\\"
+index_dir = \\\"/mnt/data/tim.mazhari/rag/rag_index\\\"
+print(\\\"testtest\\\")
+loader = PyPDFLoader(pdf_path)
+splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+docs = loader.load_and_split(splitter)
+
+embeddings = HuggingFaceEmbeddings(
+    model_name=\\\"/mnt/data/tim.mazhari/models/sentence-transformers/all-mpnet-base-v2\\\",
+    model_kwargs={{\\\"device\\\": \\\"cuda\\\"}}
+)
+
+if os.path.exists(index_dir):
+    vectorstore = FAISS.load_local(index_dir, embeddings, allow_dangerous_deserialization=True)
+    vectorstore.add_documents(docs)
+else:
+    vectorstore = FAISS.from_documents(docs, embeddings, allow_dangerous_deserialization=True)
+
+vectorstore.save_local(index_dir)
+print(\\\"PDF_SUCCESS\\\")
+"""
+            process_cmd = process_cmd.replace('"', '\\"')
+
             self.output_queue.put(("status", "Dokument Splitten..."))
             output, error = process_pdf(ssh_conn, remote_pdf, remote_dir, filepath)
             

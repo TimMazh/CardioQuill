@@ -11,9 +11,9 @@ import queue
 import os
 import time
 from ssh_connection import SSHConnection
-from prompt_executor import execute_prompt
-from prompt_executor import start_server
-from prompt_executor import check_server_status
+from prompt_executor import *
+from GUI.master_data_section import create_master_data_section
+from GUI.intro_section import IntroSection
 
 
 class CardioVistaApp:
@@ -22,7 +22,13 @@ class CardioVistaApp:
         self.root.title("CardioVista - Medical Scribe")
         self.root.geometry("1200x1200")
         self.root.resizable(True, True)
-        
+
+        self.container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
+
+        self.gpus = "5,6,7"
+
+        self.rag_enabled = False
+
         # Set application theme colors
         self.colors = {
             "bg_color": "#f8fafc",
@@ -137,42 +143,26 @@ class CardioVistaApp:
         main_frame = ttk.Frame(self.root)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
-        # App header with light blue accent
-        header_frame = ttk.Frame(main_frame)
-        header_frame.pack(fill=tk.X, pady=(0, 15))
-        
-        # Logo and title with light blue accent
-        logo_label = ttk.Label(header_frame, text="♥", font=('Segoe UI', 22), foreground=self.colors["accent_color"])
-        logo_label.pack(side=tk.LEFT, padx=(0, 5))
-        
-        app_title = ttk.Label(header_frame, text="CardioVista", style="Header.TLabel", font=('Segoe UI', 18, 'bold'))
-        app_title.pack(side=tk.LEFT)
-        
-        # Subtitle with light blue
-        subtitle = ttk.Label(header_frame, text="Medical Scribe", foreground=self.colors["accent_color"], font=('Segoe UI', 12))
-        subtitle.pack(side=tk.LEFT, padx=10)
-        
         # Create notebook for tabs
         self.notebook = ttk.Notebook(main_frame)
         self.notebook.pack(fill=tk.BOTH, expand=True)
         
         # Create tabs with padding and clean design
-        patient_tab = ttk.Frame(self.notebook, padding=10)
-        doctor_tab = ttk.Frame(self.notebook, padding=10)
-        medical_tab = ttk.Frame(self.notebook, padding=10)
+        master_data_tab = ttk.Frame(self.notebook, padding=10)
+        intro_tab = ttk.Frame(self.notebook, padding=10)
+
         
-        self.notebook.add(patient_tab, text="Patient Information")
-        self.notebook.add(doctor_tab, text="Doctor Information")
-        self.notebook.add(medical_tab, text="Medical Data")
-        
+        self.notebook.add(master_data_tab, text="Patient Information")
         # Patient Information Tab
-        self.create_patient_section(patient_tab)
-        
-        # Doctor Information Tab
-        self.create_doctor_section(doctor_tab)
-        
-        # Medical Data Tab
-        self.create_medical_section(medical_tab)
+        self.patient_fields = {}
+        self.doctor_fields = {}
+        create_master_data_section(self, master_data_tab)
+    
+        # Intro Tab
+        self.intro_section = IntroSection(self.notebook, intro_tab, self.patient_fields, self.doctor_fields)
+        self.intro_section.create_intro_text_tab()
+        # Bind the NotebookTabChanged event
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
         
         # Bottom section for controls and status
         control_frame = ttk.Frame(main_frame)
@@ -190,6 +180,10 @@ class CardioVistaApp:
                                     command=lambda: self.upload_pdf_to_dgx())
         self.upload_btn.pack(side=tk.LEFT, padx=5)
         
+        self.activate_rag_btn = ttk.Button(button_frame, text="RAG deaktiviert", style="Secondary.TButton", 
+                                    command=lambda: self.activate_rag())
+        self.activate_rag_btn.pack(side=tk.LEFT, padx=5)
+
         self.clear_btn = ttk.Button(button_frame, text="Clear All Fields", style="Secondary.TButton", 
                                    command=lambda: clear_fields(self))
         self.clear_btn.pack(side=tk.LEFT, padx=5)
@@ -214,192 +208,31 @@ class CardioVistaApp:
         ssh_conn.connect()
         self.server_status_received, error = check_server_status(ssh_conn)
         if "running" == self.server_status_received:
-            self.server_status.config(text="Server Status: Running")
+            self.server_status.config(text="Running")
         else:
-            self.server_status.config(text="Server Status: Not running")
+            self.server_status.config(text="Not running")
         ssh_conn.close()
-        
 
+    def on_tab_changed(self, event):
+        """
+        Wird aufgerufen, wenn der Benutzer den Tab wechselt.
+        """
+        selected_tab = self.notebook.index(self.notebook.select())
+        if selected_tab == 1:  # Index des "Einleitungstext"-Tabs
+            self.intro_section.update_intro_text()
+        
+    def activate_rag(self):
+        if self.activate_rag_btn.cget("text") == "RAG aktiviert":
+            self.rag_enabled = False
+            self.activate_rag_btn.config(text="RAG deaktiviert", style="Secondary.TButton")
+        else:
+            self.rag_enabled = True
+            self.activate_rag_btn.config(text="RAG aktiviert", style="Success.TButton")
+
+        
     
-    def create_patient_section(self, parent):
-        # Patient section with modern card layout
-        patient_frame = ttk.LabelFrame(parent, text="Patient Information", padding=15)
-        patient_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
-        # Two-column layout with responsive design
-        left_frame = ttk.Frame(patient_frame)
-        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        right_frame = ttk.Frame(patient_frame)
-        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        # Left column fields with consistent spacing
-        fields_left = [
-            ("Gender", "patient_gender", ["Male", "Female", "Other"]),
-            ("First Name", "patient_name", None),
-            ("Last Name", "patient_lastname", None)
-        ]
-        
-        self.patient_fields = {}
-        
-        for i, (label_text, attr_name, values) in enumerate(fields_left):
-            ttk.Label(left_frame, text=label_text + ":", font=('Segoe UI', 10, 'bold')).grid(row=i, column=0, padx=10, pady=12, sticky=tk.W)
             
-            if values:
-                widget = ttk.Combobox(left_frame, values=values, width=25)
-                widget.state(["!disabled", "readonly"])  # Make combobox readonly for better UX
-            else:
-                widget = ttk.Entry(left_frame, width=25)
-            
-            widget.grid(row=i, column=1, padx=10, pady=12, sticky=tk.W+tk.E)
-            self.patient_fields[attr_name] = widget
-            setattr(self, attr_name, widget)
-        
-        # Right column fields
-        fields_right = [
-            ("Date of Birth", "patient_dob", "YYYY-MM-DD"),
-            ("Address", "patient_address", ""),
-            ("Control Date", "patient_control_date", datetime.now().strftime("%Y-%m-%d"))
-        ]
-        
-        for i, (label_text, attr_name, default) in enumerate(fields_right):
-            ttk.Label(right_frame, text=label_text + ":", font=('Segoe UI', 10, 'bold')).grid(row=i, column=0, padx=10, pady=12, sticky=tk.W)
-            widget = ttk.Entry(right_frame, width=25)
-            widget.grid(row=i, column=1, padx=10, pady=12, sticky=tk.W+tk.E)
-            
-            if default:
-                widget.insert(0, default)
-            
-            self.patient_fields[attr_name] = widget
-            setattr(self, attr_name, widget)
     
-    def create_doctor_section(self, parent):
-        # Doctor section with modern card layout
-        doctor_frame = ttk.LabelFrame(parent, text="Doctor Information", padding=15)
-        doctor_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
-        # Two-column layout
-        left_frame = ttk.Frame(doctor_frame)
-        left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        right_frame = ttk.Frame(doctor_frame)
-        right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        self.doctor_fields = {}
-        
-        # Left column fields
-        fields_left = [
-            ("Gender", "doctor_gender", ["Male", "Female", "Other"]),
-            ("Title", "doctor_title", "Dr."),
-            ("Name", "doctor_name", "")
-        ]
-        
-        for i, (label_text, attr_name, default) in enumerate(fields_left):
-            ttk.Label(left_frame, text=label_text + ":", font=('Segoe UI', 10, 'bold')).grid(row=i, column=0, padx=10, pady=12, sticky=tk.W)
-            
-            if isinstance(default, list):
-                widget = ttk.Combobox(left_frame, values=default, width=25)
-                widget.state(["!disabled", "readonly"])  # Make combobox readonly
-            else:
-                widget = ttk.Entry(left_frame, width=25)
-                if default:
-                    widget.insert(0, default)
-            
-            widget.grid(row=i, column=1, padx=10, pady=12, sticky=tk.W+tk.E)
-            self.doctor_fields[attr_name] = widget
-            setattr(self, attr_name, widget)
-        
-        # Right column fields
-        fields_right = [
-            ("Clinic Name", "doctor_clinic", ""),
-            ("Address", "doctor_address", "")
-        ]
-        
-        for i, (label_text, attr_name, default) in enumerate(fields_right):
-            ttk.Label(right_frame, text=label_text + ":", font=('Segoe UI', 10, 'bold')).grid(row=i, column=0, padx=10, pady=12, sticky=tk.W)
-            widget = ttk.Entry(right_frame, width=25)
-            widget.grid(row=i, column=1, padx=10, pady=12, sticky=tk.W+tk.E)
-            
-            if default:
-                widget.insert(0, default)
-            
-            self.doctor_fields[attr_name] = widget
-            setattr(self, attr_name, widget)
-            
-    def create_medical_section(self, parent):
-        # Add a container for the medical data with padding
-        container = ttk.Frame(parent, padding=10)
-        container.pack(fill=tk.BOTH, expand=True)
-        
-        # Style for section headers
-        section_header_style = {'font': ('Segoe UI', 11, 'bold'), 'foreground': self.colors["accent_color"]}
-        
-        # Use Grid layout to organize medical data sections better
-        row = 0
-        col = 0
-        
-        # Create text fields for medical data entry
-        self.medical_fields = {}
-        
-        # Function to create a labeled text field
-        def create_field(parent, row, col, label_text, attr_name, height=4, width=40):
-            # Create a frame with blue accent border at the top
-            field_frame = ttk.Frame(parent, padding=(0, 3, 0, 10))
-            field_frame.grid(row=row, column=col, padx=5, pady=10, sticky=tk.NSEW)
-            
-            # Add blue accent line at top
-            blue_line = ttk.Frame(field_frame, style="BlueBorder.TFrame", height=3)
-            blue_line.pack(fill=tk.X, side=tk.TOP, pady=(0, 5))
-            
-            # Label with modern styling
-            label = ttk.Label(field_frame, text=label_text, **section_header_style)
-            label.pack(anchor=tk.W, pady=(0, 5))
-            
-            # Text widget for data entry
-            text_widget = tk.Text(field_frame, height=height, width=width,
-                                  font=('Segoe UI', 10), wrap=tk.WORD,
-                                  borderwidth=1, relief=tk.SOLID)
-            text_widget.pack(fill=tk.BOTH, expand=True)
-            
-            # Add scrollbar
-            scrollbar = ttk.Scrollbar(text_widget, orient=tk.VERTICAL, command=text_widget.yview)
-            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            text_widget.config(yscrollcommand=scrollbar.set)
-            
-            # Store reference
-            self.medical_fields[attr_name] = text_widget
-            setattr(self, attr_name, text_widget)
-            
-            return text_widget
-            
-        # Create the fields in a 2x3 grid layout
-        fields = [
-            ("Chief Complaint", "start_text"),
-            ("Diagnosis", "diagnosis"),
-            ("Cardiovascular Risk Factors", "cv_risk_factors"),
-            ("Other Diagnoses", "side_diagnosis"),
-            ("Procedures", "procedure"),
-            ("Anamnesis", "anamnese"),
-            ("Medication", "medication"),
-            ("Physical Examination", "inspection"),
-            ("ECG", "ekg"),
-            ("Echocardiography", "echo"),
-            ("Ergometry", "ergometrie"),
-            ("Long-term ECG", "long_ekg"),
-            ("Cardiac CT", "ct")
-        ]
-        
-        # Arrange fields in 3 columns
-        for i, (label, attr) in enumerate(fields):
-            row = i % 5
-            col = i // 5
-            create_field(container, row, col, label, attr)
-            
-        # Configure grid weights for responsive layout
-        for i in range(5):
-            container.grid_rowconfigure(i, weight=1)
-        for i in range(3):
-            container.grid_columnconfigure(i, weight=1)
             
     def generate_report(self):
         try:
@@ -479,7 +312,7 @@ class CardioVistaApp:
 
     def send_ssh_request(self):
             #prompt = self.ssh_input.get("1.0", tk.END).strip()
-            prompt = "Wer ist der Präsident von Deutschland?"
+            prompt = "Wer ist Johnatan Michalis von der Testgeschichte?"
             if not prompt:
                 return
             Thread(target=self._execute_ssh_query, args=(prompt,), daemon=True).start()
@@ -487,7 +320,7 @@ class CardioVistaApp:
     def _execute_ssh_query(self, query):
         # Serverstatus prüfen und ggf. starten
         if self.server_status != "running":
-            self.app_status.config(text="Server Status: starting...")
+            self.server_status.config(text="Starting...")
             #self.output_queue.put(("status", "Server starting..."))
             
 
@@ -500,10 +333,10 @@ class CardioVistaApp:
                 start_server(ssh_conn=ssh_conn)                   
                 self.server_status_received, error = check_server_status(ssh_conn)
                 if "running" == self.server_status_received:
-                    self.server_status.config(text="Server Status: running")
+                    self.server_status.config(text="Running")
                 else:
                     #self.output_queue.put(("ssh", f">>> Starte Server"))
-                    self.server_status.config(text="Server Status: not running")
+                    self.server_status.config(text="Not running")
 
                 ssh_conn.close()
         
@@ -519,6 +352,8 @@ class CardioVistaApp:
             ssh_conn.connect()
             
             self.app_status.config(text="Frage LLM ab...")
+            if self.rag_enabled:
+                query = query + "_USE_RAG_"
             output, error = execute_prompt(ssh_conn, query)
             
             if error:
@@ -527,80 +362,67 @@ class CardioVistaApp:
             if output:
                 #self.output_queue.put(("ssh", f"<<< LLM Antwort:\n{output}"))
                 print(output)
+                self.llm_output.config(state='normal')
+                self.llm_output.insert(tk.END, f"<<< LLM Antwort:\n{output}\n")
+                self.llm_output.config(state='disabled')
+                self.llm_output.see(tk.END)
             
             self.app_status.config(text="Antwort empfangen")
             ssh_conn.close()
         except Exception as e:
             #self.output_queue.put(("ssh", f"SSH Fehler: {str(e)}"))
             #self.output_queue.put(("status", "Verbindungsfehler"))
-            self.app_status.config(text="Verbindungsfehler")
+            self.app_status.config(text="Fehler")
 
 
     def upload_pdf_to_dgx(self):
         filepath = filedialog.askopenfilename(filetypes=[("PDF Files", "*.pdf")])
         if not filepath:
             return
-        self.output_queue.put(("status", "Lade PDF auf DGX-2 hoch..."))
+        #self.output_queue.put(("status", "Lade PDF auf DGX-2 hoch..."))
+        self.app_status.config(text="Lade PDF auf DGX-2 hoch...")
+
         Thread(target=self._process_remote_pdf, args=(filepath,), daemon=True).start()
     
     def _process_remote_pdf(self, filepath):
         try:
             ssh_conn = SSHConnection()
             ssh_conn.connect()
-            self.output_queue.put(("status", "Verbunden mit DGX-2"))
+            #self.output_queue.put(("status", "Verbunden mit DGX-2"))
     
             remote_dir = "/mnt/data/tim.mazhari/rag/rag_docs/"
             remote_pdf = remote_dir + os.path.basename(filepath)
     
             ssh_conn.run_command(f"mkdir -p {remote_dir}")
-            self.output_queue.put(("status", "RAG Verzeichnis erstellt"))
+            #self.output_queue.put(("status", "RAG Verzeichnis erstellt"))
+            self.app_status.config(text="RAG Verzeichnis erstellt")
+
     
             ssh_conn.upload_file(filepath, remote_pdf)
-            self.output_queue.put(("status", "Dokument Hochgeladen"))
+            #self.output_queue.put(("status", "Dokument Hochgeladen"))
+            self.app_status.config(text="Dokument Hochgeladen")
+            
     
-            process_cmd = f"""export APPTAINERENV_CUDA_VISIBLE_DEVICES=0,1,2 && apptainer exec --nv {self.container_path} python3 -c '
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
-import os
-
-pdf_path = \\\"{remote_pdf}\\\"
-index_dir = \\\"/mnt/data/tim.mazhari/rag/rag_index\\\"
-print(\\\"testtest\\\")
-loader = PyPDFLoader(pdf_path)
-splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-docs = loader.load_and_split(splitter)
-
-embeddings = HuggingFaceEmbeddings(
-    model_name=\\\"/mnt/data/tim.mazhari/models/sentence-transformers/all-mpnet-base-v2\\\",
-    model_kwargs={{\\\"device\\\": \\\"cuda\\\"}}
-)
-
-if os.path.exists(index_dir):
-    vectorstore = FAISS.load_local(index_dir, embeddings, allow_dangerous_deserialization=True)
-    vectorstore.add_documents(docs)
-else:
-    vectorstore = FAISS.from_documents(docs, embeddings, allow_dangerous_deserialization=True)
-
-vectorstore.save_local(index_dir)
-print(\\\"PDF_SUCCESS\\\")
-"""
-            self.output_queue.put(("status", "Dokument Splitten..."))
-            output, error = ssh_conn.run_command(process_cmd)
+            output, error = process_pdf(ssh_conn, remote_pdf, remote_dir, filepath)
     
             if "PDF_SUCCESS" in output:
                 self.uploaded_pdfs.append(remote_pdf)
                 self.pdf_list_ssh.insert(tk.END, os.path.basename(filepath))
-                self.output_queue.put(("ssh", f"PDF verarbeitet: {os.path.basename(filepath)}"))
-                self.output_queue.put(("status", "PDF Verarbeitet"))
+                #self.output_queue.put(("ssh", f"PDF verarbeitet: {os.path.basename(filepath)}"))
+                #self.output_queue.put(("status", "PDF Verarbeitet"))
+                self.app_status.config(text=f"PDF verarbeitet: {os.path.basename(filepath)}")
+
             else:
-                self.output_queue.put(("ssh", f"Fehler: {error}"))
+                #self.output_queue.put(("ssh", f"Fehler: {error}"))
+                self.app_status.config(text="Fehler")
+
     
             ssh_conn.close()
     
         except Exception as e:
-            self.output_queue.put(("ssh", f"Upload-Fehler: {str(e)}"))
+            #self.output_queue.put(("ssh", f"Upload-Fehler: {str(e)}"))
+            self.app_status.config(text="Upload-Fehler: " + str(e))
+
 
 
 if __name__ == "__main__":
