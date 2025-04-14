@@ -57,7 +57,7 @@ class PhysicalExaminationSection:
 
         ttk.Label(measurements_frame, text="Ruhepuls (min):").grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
         ttk.Entry(measurements_frame, textvariable=self.pulse_var).grid(row=5, column=1, padx=5, pady=5)
-        # Seitendifferenz
+# Seitendifferenz
         self.side_difference_var = tk.StringVar(value="Nein")
         ttk.Label(measurements_frame, text="Seitendifferenz:").grid(row=6, column=0, padx=5, pady=5, sticky=tk.W)
         ttk.Radiobutton(measurements_frame, text="Ja", variable=self.side_difference_var, value="Ja", command=self.update_physical_examination_text).grid(row=6, column=1, padx=5, pady=5, sticky=tk.W)
@@ -97,6 +97,38 @@ class PhysicalExaminationSection:
         self.heart_pathology_text_entry = ttk.Entry(heart_frame, textvariable=self.heart_pathology_text_var, state="disabled")
         self.heart_pathology_text_entry.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
+        # Pulse
+        pulse_frame = ttk.LabelFrame(self.physical_examination_tab, text="Pulse", padding=10)
+        pulse_frame.pack(fill=tk.X, padx=10, pady=10)
+
+        self.pulse_all_var = tk.StringVar(value="Ja")
+        ttk.Label(pulse_frame, text="Pulse allseits gut tastbar:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(pulse_frame, text="Ja", variable=self.pulse_all_var, value="Ja", command=self.update_physical_examination_text).grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(pulse_frame, text="Nein", variable=self.pulse_all_var, value="Nein", command=self.update_physical_examination_text).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
+
+        self.pulse_text_var = tk.StringVar()
+        self.pulse_text_entry = ttk.Entry(pulse_frame, textvariable=self.pulse_text_var, state="disabled")
+        self.pulse_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
+
+        self.flow_noise_var = tk.StringVar(value="Nein")
+        ttk.Label(pulse_frame, text="Strömungsgeräusche:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(pulse_frame, text="Ja", variable=self.flow_noise_var, value="Ja", command=self.update_flow_noise).grid(row=2, column=1, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(pulse_frame, text="Nein", variable=self.flow_noise_var, value="Nein", command=self.update_flow_noise).grid(row=2, column=2, padx=5, pady=5, sticky=tk.W)
+
+        self.flow_noise_text_var = tk.StringVar()
+        self.flow_noise_text_entry = ttk.Entry(pulse_frame, textvariable=self.flow_noise_text_var, state="disabled")
+        self.flow_noise_text_entry.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
+
+        self.edema_var = tk.StringVar(value="Nein")
+        ttk.Label(pulse_frame, text="Ödeme:").grid(row=4, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(pulse_frame, text="Ja", variable=self.edema_var, value="Ja", command=self.update_edema).grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(pulse_frame, text="Nein", variable=self.edema_var, value="Nein", command=self.update_edema).grid(row=4, column=2, padx=5, pady=5, sticky=tk.W)
+
+        self.edema_text_var = tk.StringVar()
+        self.edema_text_entry = ttk.Entry(pulse_frame, textvariable=self.edema_text_var, state="disabled")
+        self.edema_text_entry.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
+
+
         # Ausgabefeld für generierten Text
         output_frame = ttk.LabelFrame(self.physical_examination_tab, text="Generierter Text", padding=10)
         output_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -127,6 +159,28 @@ class PhysicalExaminationSection:
         else:
             self.heart_pathology_text_entry.config(state="disabled")
             self.heart_pathology_text_var.set("")
+        self.update_physical_examination_text()
+
+    def update_flow_noise(self):
+        """
+        Aktiviert oder deaktiviert das Freitextfeld für Strömungsgeräusche basierend auf der Auswahl.
+        """
+        if self.flow_noise_var.get() == "Ja":
+            self.flow_noise_text_entry.config(state="normal")
+        else:
+            self.flow_noise_text_entry.config(state="disabled")
+            self.flow_noise_text_var.set("")
+        self.update_physical_examination_text()
+
+    def update_edema(self):
+        """
+        Aktiviert oder deaktiviert das Freitextfeld für Ödeme basierend auf der Auswahl.
+        """
+        if self.edema_var.get() == "Ja":
+            self.edema_text_entry.config(state="normal")
+        else:
+            self.edema_text_entry.config(state="disabled")
+            self.edema_text_var.set("")
         self.update_physical_examination_text()
 
     def update_physical_examination_text(self):
@@ -167,6 +221,25 @@ class PhysicalExaminationSection:
         else:
             side_difference = "keine Seitendifferenz"
 
+        # Pulse allseits gut tastbar
+        if self.pulse_all_var.get() == "Ja":
+            pulse_text = "Pulse allseits gut tastbar."
+            self.pulse_text_entry.config(state="disabled")
+        else:
+            pulse_text = self.pulse_text_var.get()
+            self.pulse_text_entry.config(state="normal")
+        # Strömungsgeräusche
+        if self.flow_noise_var.get() == "Ja":
+            flow_noise_text = self.flow_noise_text_var.get()
+        else:
+            flow_noise_text = "Keine Strömungsgeräusche."
+
+        # Ödeme
+        if self.edema_var.get() == "Ja":
+            edema_text = self.edema_text_var.get()
+        else:
+            edema_text = "Keine preipheren Ödeme. Kardinal kompensiert."
+
         # Auskultation Lunge
         if self.lung_abnormal_var.get() == "Ja":
             lung_text = self.lung_text_var.get()
@@ -175,7 +248,7 @@ class PhysicalExaminationSection:
 
         # Auskultation Herz
         if self.heart_rhythm_var.get() == "Cor":
-            heart_text = "Cor rhytmisch"
+            heart_text = "Cor rhytmisch."
             self.heart_rhythm_text_entry.config(state="disabled")
 
         else:
@@ -191,7 +264,7 @@ class PhysicalExaminationSection:
         physical_examination_text = (
             f"{az} AZ und {ez} EZ. Körpergröße {height} cm, Körpergewicht {weight} kg, BMI {bmi} kg/m². "
             f"Blutdruck in Ruhe links {bp_left_sys}/{bp_left_dia} mmHg, rechts {bp_right_sys}/{bp_right_dia} mmHg, {side_difference}. "
-            f"Ruhepuls {pulse}/min. {lung_text} {heart_text}, {pathology_text}"
+            f"Ruhepuls {pulse}/min. {lung_text} {heart_text} {pathology_text} {pulse_text} {flow_noise_text} {edema_text}"
         )
 
         # Speichere den generierten Text
