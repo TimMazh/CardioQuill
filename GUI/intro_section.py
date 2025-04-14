@@ -16,7 +16,7 @@ class IntroSection:
 
     def create_intro_text_tab(self):
         # Tab für Einleitungstext erstellen
-        self.notebook.add(self.intro_tab, text="Einleitungstext")
+        self.notebook.add(self.intro_tab, text="Einleitung")
 
         # Radiobuttons für die Anrede
         anrede_frame = ttk.LabelFrame(self.intro_tab, text="Anrede", padding=10)

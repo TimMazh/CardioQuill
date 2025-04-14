@@ -13,10 +13,10 @@ class DiagnosisSection:
 
     def create_diagnosis_text_tab(self):
         # Tab für Diagnosetext erstellen
-        self.notebook.add(self.diagnosis_tab, text="Diagnosetext")
+        self.notebook.add(self.diagnosis_tab, text="Diagnose")
 
         # Freitextfeld für den Diagnosetext
-        text_frame = ttk.LabelFrame(self.diagnosis_tab, text="Diagnosetext", padding=10)
+        text_frame = ttk.LabelFrame(self.diagnosis_tab, text="Diagnose", padding=10)
         text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         self.diagnosis_text = scrolledtext.ScrolledText(text_frame, wrap=tk.WORD, height=10)
