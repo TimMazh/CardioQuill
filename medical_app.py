@@ -12,9 +12,11 @@ import os
 import time
 from ssh_connection import SSHConnection
 from prompt_executor import *
-from GUI.master_data_section import create_master_data_section
+
+from GUI.master_data_section import MasterDataSection
 from GUI.intro_section import IntroSection
 from GUI.diagnosis_section import DiagnosisSection
+from GUI.cardiovascular_risk_factors_section import CardiovascularRiskFactorsSection
 
 class CardioVistaApp:
     def __init__(self, root):
@@ -151,14 +153,15 @@ class CardioVistaApp:
         master_data_tab = ttk.Frame(self.notebook, padding=10)
         intro_tab = ttk.Frame(self.notebook, padding=10)
         diagnosis_tab = ttk.Frame(self.notebook, padding=10)
+        cardiovascular_risk_factors_tab = ttk.Frame(self.notebook, padding=10) 
 
         
-        self.notebook.add(master_data_tab, text="Patient Information")
-        # Patient Information Tab
+        # Master Data Tab
         self.doctors_letter = {}
         
-
-        create_master_data_section(self, master_data_tab)
+        
+        self.master_data_section = MasterDataSection(self.notebook, master_data_tab, self.doctors_letter)
+        self.master_data_section.create_master_data_section()
         
         # Intro Tab
         self.intro_section = IntroSection(self.notebook, intro_tab, self.doctors_letter)
@@ -169,6 +172,12 @@ class CardioVistaApp:
         #Diagnosis Tab
         self.diagnosis_section = DiagnosisSection(self.notebook, diagnosis_tab, self.doctors_letter)
         self.diagnosis_section.create_diagnosis_text_tab()
+
+        # Cardiovascular Risk Factors Tab
+        self.cardiovascular_risk_factors_section = CardiovascularRiskFactorsSection(self.notebook, cardiovascular_risk_factors_tab, self.doctors_letter)
+        self.cardiovascular_risk_factors_section.create_cardiovascular_risk_factors_text_tab()
+
+
         # Bottom section for controls and status
         control_frame = ttk.Frame(main_frame)
         control_frame.pack(fill=tk.X, pady=15)
