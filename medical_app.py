@@ -17,6 +17,10 @@ from GUI.master_data_section import MasterDataSection
 from GUI.intro_section import IntroSection
 from GUI.diagnosis_section import DiagnosisSection
 from GUI.cardiovascular_risk_factors_section import CardiovascularRiskFactorsSection
+from GUI.secondary_diagnosis_section import SecondaryDiagnosisSection
+from GUI.recommended_procedure_section import RecommendedProcedureSection
+from GUI.anamnesis_section import AnamnesisSection
+from GUI.previous_medication import PreviousMedicationSection
 
 class CardioVistaApp:
     def __init__(self, root):
@@ -154,7 +158,11 @@ class CardioVistaApp:
         intro_tab = ttk.Frame(self.notebook, padding=10)
         diagnosis_tab = ttk.Frame(self.notebook, padding=10)
         cardiovascular_risk_factors_tab = ttk.Frame(self.notebook, padding=10) 
-
+        secondary_diagnosis_tab = ttk.Frame(self.notebook, padding=10)
+        recommended_procedure_tab = ttk.Frame(self.notebook, padding=10)
+        anamnesis_tab = ttk.Frame(self.notebook, padding=10)
+        previous_medication_tab = ttk.Frame(self.notebook, padding=10) 
+        
         
         # Master Data Tab
         self.doctors_letter = {}
@@ -177,6 +185,21 @@ class CardioVistaApp:
         self.cardiovascular_risk_factors_section = CardiovascularRiskFactorsSection(self.notebook, cardiovascular_risk_factors_tab, self.doctors_letter)
         self.cardiovascular_risk_factors_section.create_cardiovascular_risk_factors_text_tab()
 
+        # Secondary Diagnosis Tab
+        self.secondary_diagnosis_section = SecondaryDiagnosisSection(self.notebook, secondary_diagnosis_tab, self.doctors_letter)
+        self.secondary_diagnosis_section.create_secondary_diagnosis_text_tab()
+
+        # Recommended Procedure Tab
+        self.recommended_procedure_section = RecommendedProcedureSection(self.notebook, recommended_procedure_tab, self.doctors_letter)
+        self.recommended_procedure_section.create_recommended_procedure_text_tab()
+
+        # Anamnesis Tab
+        self.anamnesis_section = AnamnesisSection(self.notebook, anamnesis_tab, self.doctors_letter)
+        self.anamnesis_section.create_anamnesis_text_tab()
+
+        # Previous Medication Tab
+        self.previous_medication_section = PreviousMedicationSection(self.notebook, previous_medication_tab, self.doctors_letter)
+        self.previous_medication_section.create_previous_medication_text_tab()
 
         # Bottom section for controls and status
         control_frame = ttk.Frame(main_frame)
