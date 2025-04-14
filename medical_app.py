@@ -21,6 +21,7 @@ from GUI.secondary_diagnosis_section import SecondaryDiagnosisSection
 from GUI.recommended_procedure_section import RecommendedProcedureSection
 from GUI.anamnesis_section import AnamnesisSection
 from GUI.previous_medication import PreviousMedicationSection
+from GUI.physical_examination_section import PhysicalExaminationSection
 
 class CardioVistaApp:
     def __init__(self, root):
@@ -162,6 +163,8 @@ class CardioVistaApp:
         recommended_procedure_tab = ttk.Frame(self.notebook, padding=10)
         anamnesis_tab = ttk.Frame(self.notebook, padding=10)
         previous_medication_tab = ttk.Frame(self.notebook, padding=10) 
+        physical_examination_tab = ttk.Frame(self.notebook, padding=10) 
+
         
         
         # Master Data Tab
@@ -200,6 +203,10 @@ class CardioVistaApp:
         # Previous Medication Tab
         self.previous_medication_section = PreviousMedicationSection(self.notebook, previous_medication_tab, self.doctors_letter)
         self.previous_medication_section.create_previous_medication_text_tab()
+
+        # Physical Examination Tab
+        self.physical_examination_section = PhysicalExaminationSection(self.notebook, physical_examination_tab, self.doctors_letter)
+        self.physical_examination_section.create_physical_examination_tab()
 
         # Bottom section for controls and status
         control_frame = ttk.Frame(main_frame)
