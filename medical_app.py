@@ -14,7 +14,7 @@ from ssh_connection import SSHConnection
 from prompt_executor import *
 from GUI.master_data_section import create_master_data_section
 from GUI.intro_section import IntroSection
-
+from GUI.diagnosis_section import DiagnosisSection
 
 class CardioVistaApp:
     def __init__(self, root):
@@ -150,20 +150,25 @@ class CardioVistaApp:
         # Create tabs with padding and clean design
         master_data_tab = ttk.Frame(self.notebook, padding=10)
         intro_tab = ttk.Frame(self.notebook, padding=10)
+        diagnosis_tab = ttk.Frame(self.notebook, padding=10)
 
         
         self.notebook.add(master_data_tab, text="Patient Information")
         # Patient Information Tab
-        self.patient_fields = {}
-        self.doctor_fields = {}
+        self.doctors_letter = {}
+        
+
         create_master_data_section(self, master_data_tab)
-    
+        
         # Intro Tab
-        self.intro_section = IntroSection(self.notebook, intro_tab, self.patient_fields, self.doctor_fields)
+        self.intro_section = IntroSection(self.notebook, intro_tab, self.doctors_letter)
         self.intro_section.create_intro_text_tab()
         # Bind the NotebookTabChanged event
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
-        
+
+        #Diagnosis Tab
+        self.diagnosis_section = DiagnosisSection(self.notebook, diagnosis_tab, self.doctors_letter)
+        self.diagnosis_section.create_diagnosis_text_tab()
         # Bottom section for controls and status
         control_frame = ttk.Frame(main_frame)
         control_frame.pack(fill=tk.X, pady=15)
@@ -229,11 +234,6 @@ class CardioVistaApp:
             self.rag_enabled = True
             self.activate_rag_btn.config(text="RAG aktiviert", style="Success.TButton")
 
-        
-    
-            
-    
-            
     def generate_report(self):
         try:
             self.app_status.configure(text="Generating report...", style="Status.TLabel")

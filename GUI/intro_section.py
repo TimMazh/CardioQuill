@@ -3,10 +3,10 @@ from tkinter import ttk
 from tkinter import scrolledtext
 
 class IntroSection:
-    def __init__(self, notebook, intro_tab, patient_fields, doctor_fields):
-        self.patient_fields = patient_fields
-        self.doctor_fields = doctor_fields
-
+    def __init__(self, notebook, intro_tab, doctors_letter):
+        self.patient_fields = doctors_letter["patient_fields"]
+        self.doctor_fields = doctors_letter["doctor_fields"]
+        self.doctors_letter = doctors_letter
         # Notebook für Tabs erstellen
         self.notebook = notebook
         self.intro_tab = intro_tab
@@ -26,7 +26,7 @@ class IntroSection:
         self.anrede_var = tk.StringVar(value="Sehr geehrte")
         ttk.Radiobutton(anrede_frame, text="Liebe", variable=self.anrede_var, value="Liebe", command=self.update_intro_text).pack(side=tk.LEFT, padx=5, pady=5)
         ttk.Radiobutton(anrede_frame, text="Sehr geehrte", variable=self.anrede_var, value="Sehr geehrte", command=self.update_intro_text).pack(side=tk.LEFT, padx=5, pady=5)
-        
+
         # Freitextfeld für den Einleitungstext
         text_frame = ttk.LabelFrame(self.intro_tab, text="Einleitungstext", padding=10)
         text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -84,3 +84,5 @@ class IntroSection:
         # Textfeld aktualisieren
         self.intro_text.delete("1.0", tk.END)
         self.intro_text.insert(tk.END, intro_text)
+        self.doctors_letter["intro_text"] = intro_text
+        print("")

@@ -5,6 +5,12 @@ from datetime import datetime
 
 def create_master_data_section(self, parent):
     # Haupt-Frame für Patient- und Doctor-Section
+    self.patient_fields = {}
+    self.doctor_fields = {}
+
+    self.doctors_letter["patient_fields"] = self.patient_fields
+    self.doctors_letter["doctor_fields"] = self.doctor_fields
+    
     main_frame = ttk.Frame(parent)
     main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -38,7 +44,7 @@ def create_master_data_section(self, parent):
             widget = ttk.Entry(left_frame, width=25)
 
         widget.grid(row=i, column=1, padx=10, pady=12, sticky=tk.W + tk.E)
-        self.patient_fields[attr_name] = widget
+        self.doctors_letter["patient_fields"][attr_name] = widget
         setattr(self, attr_name, widget)
 
     # Right column fields für Patient-Section
@@ -56,7 +62,7 @@ def create_master_data_section(self, parent):
         if default:
             widget.insert(0, default)
 
-        self.patient_fields[attr_name] = widget
+        self.doctors_letter["patient_fields"][attr_name] = widget
         setattr(self, attr_name, widget)
 
     # Doctor-Section unten
@@ -89,7 +95,7 @@ def create_master_data_section(self, parent):
             widget = ttk.Entry(doctor_left_frame, width=25)
 
         widget.grid(row=i, column=1, padx=10, pady=12, sticky=tk.W + tk.E)
-        self.doctor_fields[attr_name] = widget
+        self.doctors_letter["doctor_fields"][attr_name] = widget
         setattr(self, attr_name, widget)
 
     # Right column fields für Doctor-Section
@@ -103,7 +109,7 @@ def create_master_data_section(self, parent):
         ttk.Label(doctor_right_frame, text=label_text + ":", font=('Segoe UI', 10, 'bold')).grid(row=i, column=0, padx=10, pady=12, sticky=tk.W)
         widget = ttk.Entry(doctor_right_frame, width=25)
         widget.grid(row=i, column=1, padx=10, pady=12, sticky=tk.W + tk.E)
-        self.doctor_fields[attr_name] = widget
+        self.doctors_letter["doctor_fields"][attr_name] = widget
         setattr(self, attr_name, widget)
 
     # Add temporary output field for LLM response
