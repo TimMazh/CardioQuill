@@ -57,12 +57,45 @@ class PhysicalExaminationSection:
 
         ttk.Label(measurements_frame, text="Ruhepuls (min):").grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
         ttk.Entry(measurements_frame, textvariable=self.pulse_var).grid(row=5, column=1, padx=5, pady=5)
-
         # Seitendifferenz
         self.side_difference_var = tk.StringVar(value="Nein")
         ttk.Label(measurements_frame, text="Seitendifferenz:").grid(row=6, column=0, padx=5, pady=5, sticky=tk.W)
         ttk.Radiobutton(measurements_frame, text="Ja", variable=self.side_difference_var, value="Ja", command=self.update_physical_examination_text).grid(row=6, column=1, padx=5, pady=5, sticky=tk.W)
         ttk.Radiobutton(measurements_frame, text="Nein", variable=self.side_difference_var, value="Nein", command=self.update_physical_examination_text).grid(row=6, column=2, padx=5, pady=5, sticky=tk.W)
+        # Auskultation Lunge
+        lung_frame = ttk.LabelFrame(self.physical_examination_tab, text="Auskultation Lunge", padding=10)
+        lung_frame.pack(fill=tk.X, padx=10, pady=10)
+
+        self.lung_abnormal_var = tk.StringVar(value="Nein")
+        ttk.Label(lung_frame, text="Auskultation Lunge abnormal?").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(lung_frame, text="Ja", variable=self.lung_abnormal_var, value="Ja", command=self.update_lung_text).grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(lung_frame, text="Nein", variable=self.lung_abnormal_var, value="Nein", command=self.update_lung_text).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
+
+        self.lung_text_var = tk.StringVar()
+        self.lung_text_entry = ttk.Entry(lung_frame, textvariable=self.lung_text_var, state="disabled")
+        self.lung_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
+        
+        # Auskultation Herz
+        heart_frame = ttk.LabelFrame(self.physical_examination_tab, text="Auskultation Herz", padding=10)
+        heart_frame.pack(fill=tk.X, padx=10, pady=10)
+
+        self.heart_rhythm_var = tk.StringVar(value="Cor")
+        ttk.Label(heart_frame, text="Herzrhythmus:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(heart_frame, text="Cor", variable=self.heart_rhythm_var, value="Cor", command=self.update_physical_examination_text).grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(heart_frame, text="Arrhytmisch", variable=self.heart_rhythm_var, value="Arrhytmisch", command=self.update_physical_examination_text).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
+
+        self.heart_rhythm_text_var = tk.StringVar()
+        self.heart_rhythm_text_entry = ttk.Entry(heart_frame, textvariable=self.heart_rhythm_text_var, state="disabled")
+        self.heart_rhythm_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
+
+        self.heart_pathology_var = tk.StringVar(value="Nein")
+        ttk.Label(heart_frame, text="Pathologische Nebentöne:").grid(row=2, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(heart_frame, text="Ja", variable=self.heart_pathology_var, value="Ja", command=self.update_heart_pathology).grid(row=2, column=1, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(heart_frame, text="Nein", variable=self.heart_pathology_var, value="Nein", command=self.update_heart_pathology).grid(row=2, column=2, padx=5, pady=5, sticky=tk.W)
+
+        self.heart_pathology_text_var = tk.StringVar()
+        self.heart_pathology_text_entry = ttk.Entry(heart_frame, textvariable=self.heart_pathology_text_var, state="disabled")
+        self.heart_pathology_text_entry.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
         # Ausgabefeld für generierten Text
         output_frame = ttk.LabelFrame(self.physical_examination_tab, text="Generierter Text", padding=10)
@@ -72,6 +105,28 @@ class PhysicalExaminationSection:
         self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         # Aktualisiere den Text bei Änderungen
+        self.update_physical_examination_text()
+
+    def update_lung_text(self):
+        """
+        Aktiviert oder deaktiviert das Freitextfeld für die Lunge basierend auf der Auswahl.
+        """
+        if self.lung_abnormal_var.get() == "Ja":
+            self.lung_text_entry.config(state="normal")
+        else:
+            self.lung_text_entry.config(state="disabled")
+            self.lung_text_var.set("")
+        self.update_physical_examination_text()
+
+    def update_heart_pathology(self):
+        """
+        Aktiviert oder deaktiviert das Freitextfeld für pathologische Nebentöne basierend auf der Auswahl.
+        """
+        if self.heart_pathology_var.get() == "Ja":
+            self.heart_pathology_text_entry.config(state="normal")
+        else:
+            self.heart_pathology_text_entry.config(state="disabled")
+            self.heart_pathology_text_var.set("")
         self.update_physical_examination_text()
 
     def update_physical_examination_text(self):
@@ -112,11 +167,31 @@ class PhysicalExaminationSection:
         else:
             side_difference = "keine Seitendifferenz"
 
+        # Auskultation Lunge
+        if self.lung_abnormal_var.get() == "Ja":
+            lung_text = self.lung_text_var.get()
+        else:
+            lung_text = "Pulmo mit VAG beidseits, keine Rasselgeräusche."
+
+        # Auskultation Herz
+        if self.heart_rhythm_var.get() == "Cor":
+            heart_text = "Cor rhytmisch"
+            self.heart_rhythm_text_entry.config(state="disabled")
+
+        else:
+            heart_text = f"Arrhytmisch, {self.heart_rhythm_text_var.get()}"
+            self.heart_rhythm_text_entry.config(state="normal")
+
+        if self.heart_pathology_var.get() == "Ja":
+            pathology_text = self.heart_pathology_text_var.get()
+        else:
+            pathology_text = "keine pathologischen Nebentöne."
+
         # Generiere den Text
         physical_examination_text = (
             f"{az} AZ und {ez} EZ. Körpergröße {height} cm, Körpergewicht {weight} kg, BMI {bmi} kg/m². "
             f"Blutdruck in Ruhe links {bp_left_sys}/{bp_left_dia} mmHg, rechts {bp_right_sys}/{bp_right_dia} mmHg, {side_difference}. "
-            f"Ruhepuls {pulse}/min."
+            f"Ruhepuls {pulse}/min. {lung_text} {heart_text}, {pathology_text}"
         )
 
         # Speichere den generierten Text
