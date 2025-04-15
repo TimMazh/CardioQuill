@@ -27,8 +27,8 @@ class CardioVistaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("CardioVista - Medical Scribe")
-        self.root.geometry("1200x1200")
-        self.root.resizable(True, True)
+        self.root.geometry("1440x790")
+        self.root.resizable(False, False)
 
         self.container_path = "/mnt/data/tim.mazhari/sif/qwq32b.sif"
 
@@ -59,7 +59,9 @@ class CardioVistaApp:
         self.style = ttk.Style()
         
         # Frame styling
-        self.style.configure("TFrame", background=self.colors["bg_color"])
+        self.style.configure("TFrame", 
+                             background=self.colors["bg_color"],
+                             padding=2)
         
         # Label styling
         self.style.configure("TLabel", 
@@ -136,7 +138,9 @@ class CardioVistaApp:
         self.style.configure("TLabelframe", 
                           background="white",
                           borderwidth=1,
-                          relief="solid")
+                          relief="solid",
+                          padding=5)
+        
         self.style.configure("TLabelframe.Label", 
                           font=('Segoe UI', 11, 'bold'),
                           background="white",
@@ -147,12 +151,32 @@ class CardioVistaApp:
     
     def create_widgets(self):
         # Main container
-        main_frame = ttk.Frame(self.root)
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        #main_frame = ttk.Frame(self.root)
+        #main_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
+        main_frame = ttk.Frame(self.root)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Canvas und Scrollbar erstellen
+        self.canvas = tk.Canvas(main_frame)
+        scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = ttk.Frame(self.canvas)
+
+        # Canvas konfigurieren
+        self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+
+        # Mausrad-Scrolling hinzufügen
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+
+        # Elemente einpacken
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
         # Create notebook for tabs
-        self.notebook = ttk.Notebook(main_frame)
-        self.notebook.pack(fill=tk.BOTH, expand=True)
+        self.notebook = ttk.Notebook(self.scrollable_frame)
+        self.notebook.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
         # Create tabs with padding and clean design
         master_data_tab = ttk.Frame(self.notebook, padding=10)
@@ -209,7 +233,7 @@ class CardioVistaApp:
         self.physical_examination_section.create_physical_examination_tab()
 
         # Bottom section for controls and status
-        control_frame = ttk.Frame(main_frame)
+        control_frame = ttk.Frame(self.root)
         control_frame.pack(fill=tk.X, pady=15)
         
         # Action buttons with modern styling
@@ -256,6 +280,13 @@ class CardioVistaApp:
         else:
             self.server_status.config(text="Not running")
         ssh_conn.close()
+
+    def _on_mousewheel(self, event):
+        """Handles mousewheel scrolling for all platforms"""
+        if event.num == 4 or event.delta > 0:
+            self.canvas.yview_scroll(-1, "units")
+        elif event.num == 5 or event.delta < 0:
+            self.canvas.yview_scroll(1, "units")
 
     def on_tab_changed(self, event):
         """

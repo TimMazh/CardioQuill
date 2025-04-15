@@ -13,30 +13,61 @@ class PhysicalExaminationSection:
         # Tab hinzufügen
         self.notebook.add(self.physical_examination_tab, text="Körperliche Untersuchung")
 
+        # Haupt-Frame Anpassung
+        main_frame = ttk.Frame(self.physical_examination_tab)
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5, 2))  # Vollständige horizontale Ausdehnung
+
+        # Konfiguration des Grid-Layouts für gleichmäßige Verteilung
+        main_frame.columnconfigure(0, weight=1)  # Linke Spalte
+        main_frame.columnconfigure(1, weight=1)  # Rechte Spalte
+
+        # Linke Spalte: Allgemeinzustand, Körpermaße und Blutdruck
+        left_column = ttk.Frame(main_frame)
+        left_column.grid(row=0, column=0, padx=10, pady=10, sticky=tk.NSEW)
+
         # Allgemeinzustand (AZ) und Ernährungszustand (EZ)
-        az_ez_frame = ttk.LabelFrame(self.physical_examination_tab, text="Allgemein- und Ernährungszustand", padding=10)
-        az_ez_frame.pack(fill=tk.X, padx=10, pady=10)
+        az_ez_frame = ttk.LabelFrame(left_column, text="Allgemein- und Ernährungszustand", padding=10)
+        az_ez_frame.pack(fill=tk.X, padx=5, pady=5)
+
+        self.az_var = tk.StringVar(value="Guter")
+        self.az_var.trace_add("write", lambda *args: self.update_physical_examination_text())
 
         ttk.Label(az_ez_frame, text="AZ:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
-        self.az_var = tk.StringVar(value="Guter")
         ttk.Combobox(az_ez_frame, textvariable=self.az_var, values=["Guter", "Normaler", "Schlechter"], state="readonly").grid(row=0, column=1, padx=5, pady=5)
 
         ttk.Label(az_ez_frame, text="EZ:").grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
         self.ez_var = tk.StringVar(value="normaler")
+        self.ez_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         ttk.Combobox(az_ez_frame, textvariable=self.ez_var, values=["normaler", "übergewichtiger", "adipöser"], state="readonly").grid(row=1, column=1, padx=5, pady=5)
 
         # Körpermaße und Blutdruck
-        measurements_frame = ttk.LabelFrame(self.physical_examination_tab, text="Körpermaße und Blutdruck", padding=10)
-        measurements_frame.pack(fill=tk.X, padx=10, pady=10)
+        measurements_frame = ttk.LabelFrame(left_column, text="Körpermaße und Blutdruck", padding=10)
+        measurements_frame.pack(fill=tk.X, padx=5, pady=2)
 
         self.height_var = tk.StringVar()
+        self.height_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.weight_var = tk.StringVar()
+        self.weight_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.bmi_var = tk.StringVar()
+        self.bmi_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.bp_left_sys_var = tk.StringVar()
+        self.bp_left_sys_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.bp_left_dia_var = tk.StringVar()
+        self.bp_left_dia_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.bp_right_sys_var = tk.StringVar()
+        self.bp_right_sys_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.bp_right_dia_var = tk.StringVar()
+        self.bp_right_dia_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.pulse_var = tk.StringVar()
+        self.pulse_var.trace_add("write", lambda *args: self.update_physical_examination_text())
 
         ttk.Label(measurements_frame, text="Körpergröße (cm):").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
         ttk.Entry(measurements_frame, textvariable=self.height_var).grid(row=0, column=1, padx=5, pady=5)
@@ -55,16 +86,17 @@ class PhysicalExaminationSection:
         ttk.Entry(measurements_frame, textvariable=self.bp_right_sys_var, width=10).grid(row=4, column=1, padx=5, pady=5, sticky=tk.W)
         ttk.Entry(measurements_frame, textvariable=self.bp_right_dia_var, width=10).grid(row=4, column=2, padx=5, pady=5, sticky=tk.W)
 
-        ttk.Label(measurements_frame, text="Ruhepuls (min):").grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
-        ttk.Entry(measurements_frame, textvariable=self.pulse_var).grid(row=5, column=1, padx=5, pady=5)
-# Seitendifferenz
+        # Seitendifferenz unterhalb der Blutdruck-Eingaben
         self.side_difference_var = tk.StringVar(value="Nein")
-        ttk.Label(measurements_frame, text="Seitendifferenz:").grid(row=6, column=0, padx=5, pady=5, sticky=tk.W)
-        ttk.Radiobutton(measurements_frame, text="Ja", variable=self.side_difference_var, value="Ja", command=self.update_physical_examination_text).grid(row=6, column=1, padx=5, pady=5, sticky=tk.W)
-        ttk.Radiobutton(measurements_frame, text="Nein", variable=self.side_difference_var, value="Nein", command=self.update_physical_examination_text).grid(row=6, column=2, padx=5, pady=5, sticky=tk.W)
-        # Auskultation Lunge
-        lung_frame = ttk.LabelFrame(self.physical_examination_tab, text="Auskultation Lunge", padding=10)
-        lung_frame.pack(fill=tk.X, padx=10, pady=10)
+        ttk.Label(measurements_frame, text="Seitendifferenz:").grid(row=5, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(measurements_frame, text="Ja", variable=self.side_difference_var, value="Ja", command=self.update_physical_examination_text).grid(row=5, column=1, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(measurements_frame, text="Nein", variable=self.side_difference_var, value="Nein", command=self.update_physical_examination_text).grid(row=5, column=2, padx=5, pady=5, sticky=tk.W)
+
+        ttk.Label(measurements_frame, text="Ruhepuls (min):").grid(row=6, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Entry(measurements_frame, textvariable=self.pulse_var).grid(row=6, column=1, padx=5, pady=5)
+
+        lung_frame = ttk.LabelFrame(left_column, text="Auskultation Lunge", padding=10)
+        lung_frame.pack(fill=tk.X, padx=5, pady=2)
 
         self.lung_abnormal_var = tk.StringVar(value="Nein")
         ttk.Label(lung_frame, text="Auskultation Lunge abnormal?").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
@@ -72,12 +104,21 @@ class PhysicalExaminationSection:
         ttk.Radiobutton(lung_frame, text="Nein", variable=self.lung_abnormal_var, value="Nein", command=self.update_lung_text).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
 
         self.lung_text_var = tk.StringVar()
+        self.lung_text_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.lung_text_entry = ttk.Entry(lung_frame, textvariable=self.lung_text_var, state="disabled")
         self.lung_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
+
+        # Rechte Spalte: Untersuchungsbefunde
+        right_column = ttk.Frame(main_frame)
+        right_column.grid(row=0, column=1, padx=10, pady=10, sticky=tk.NSEW)
+
+        # Rechte Spalte Anpassungen
         
+
         # Auskultation Herz
-        heart_frame = ttk.LabelFrame(self.physical_examination_tab, text="Auskultation Herz", padding=10)
-        heart_frame.pack(fill=tk.X, padx=10, pady=10)
+        heart_frame = ttk.LabelFrame(right_column, text="Auskultation Herz", padding=10)
+        heart_frame.pack(fill=tk.X, padx=5, pady=5)
 
         self.heart_rhythm_var = tk.StringVar(value="Cor")
         ttk.Label(heart_frame, text="Herzrhythmus:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
@@ -85,6 +126,8 @@ class PhysicalExaminationSection:
         ttk.Radiobutton(heart_frame, text="Arrhytmisch", variable=self.heart_rhythm_var, value="Arrhytmisch", command=self.update_physical_examination_text).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
 
         self.heart_rhythm_text_var = tk.StringVar()
+        self.heart_rhythm_text_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.heart_rhythm_text_entry = ttk.Entry(heart_frame, textvariable=self.heart_rhythm_text_var, state="disabled")
         self.heart_rhythm_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
@@ -94,12 +137,14 @@ class PhysicalExaminationSection:
         ttk.Radiobutton(heart_frame, text="Nein", variable=self.heart_pathology_var, value="Nein", command=self.update_heart_pathology).grid(row=2, column=2, padx=5, pady=5, sticky=tk.W)
 
         self.heart_pathology_text_var = tk.StringVar()
+        self.heart_pathology_text_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.heart_pathology_text_entry = ttk.Entry(heart_frame, textvariable=self.heart_pathology_text_var, state="disabled")
         self.heart_pathology_text_entry.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
         # Pulse
-        pulse_frame = ttk.LabelFrame(self.physical_examination_tab, text="Pulse", padding=10)
-        pulse_frame.pack(fill=tk.X, padx=10, pady=10)
+        pulse_frame = ttk.LabelFrame(right_column, text="Pulse", padding=10)
+        pulse_frame.pack(fill=tk.X, padx=5, pady=5)
 
         self.pulse_all_var = tk.StringVar(value="Ja")
         ttk.Label(pulse_frame, text="Pulse allseits gut tastbar:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
@@ -107,6 +152,8 @@ class PhysicalExaminationSection:
         ttk.Radiobutton(pulse_frame, text="Nein", variable=self.pulse_all_var, value="Nein", command=self.update_physical_examination_text).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
 
         self.pulse_text_var = tk.StringVar()
+        self.pulse_text_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.pulse_text_entry = ttk.Entry(pulse_frame, textvariable=self.pulse_text_var, state="disabled")
         self.pulse_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
@@ -116,6 +163,8 @@ class PhysicalExaminationSection:
         ttk.Radiobutton(pulse_frame, text="Nein", variable=self.flow_noise_var, value="Nein", command=self.update_flow_noise).grid(row=2, column=2, padx=5, pady=5, sticky=tk.W)
 
         self.flow_noise_text_var = tk.StringVar()
+        self.flow_noise_text_var.trace_add("write", lambda *args: self.update_physical_examination_text())
+
         self.flow_noise_text_entry = ttk.Entry(pulse_frame, textvariable=self.flow_noise_text_var, state="disabled")
         self.flow_noise_text_entry.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
@@ -125,16 +174,16 @@ class PhysicalExaminationSection:
         ttk.Radiobutton(pulse_frame, text="Nein", variable=self.edema_var, value="Nein", command=self.update_edema).grid(row=4, column=2, padx=5, pady=5, sticky=tk.W)
 
         self.edema_text_var = tk.StringVar()
+        self.edema_text_var.trace_add("write", lambda *args: self.update_physical_examination_text())
         self.edema_text_entry = ttk.Entry(pulse_frame, textvariable=self.edema_text_var, state="disabled")
         self.edema_text_entry.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
-
 
         # Ausgabefeld für generierten Text
         output_frame = ttk.LabelFrame(self.physical_examination_tab, text="Generierter Text", padding=10)
         output_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        self.output_text = scrolledtext.ScrolledText(output_frame, wrap=tk.WORD, height=10)
-        self.output_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.output_text = scrolledtext.ScrolledText(output_frame, wrap=tk.WORD, height=8)
+        self.output_text.pack(fill=tk.BOTH, expand=True)
 
         # Aktualisiere den Text bei Änderungen
         self.update_physical_examination_text()
@@ -201,6 +250,20 @@ class PhysicalExaminationSection:
         bp_right_dia = self.bp_right_dia_var.get()
         pulse = self.pulse_var.get()
 
+
+        try:
+            systolic_diff = abs(int(bp_left_sys) - int(bp_right_sys))
+            diastolic_diff = abs(int(bp_left_dia) - int(bp_right_dia))
+        except ValueError:
+            physical_examination_text = "Fehler: Ungültige Blutdruckwerte."
+            # Speichere den generierten Text
+            self.doctors_letter["physical_examination"] = physical_examination_text
+
+            # Aktualisiere das Ausgabefeld
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(tk.END, physical_examination_text)
+            return
+
         # Seitendifferenz
         if self.side_difference_var.get() == "Ja":
             systolic_diff = abs(int(bp_left_sys) - int(bp_right_sys))
@@ -227,38 +290,48 @@ class PhysicalExaminationSection:
             self.pulse_text_entry.config(state="disabled")
         else:
             pulse_text = self.pulse_text_var.get()
+            pulse_text = pulse_text + "."
             self.pulse_text_entry.config(state="normal")
         # Strömungsgeräusche
         if self.flow_noise_var.get() == "Ja":
+            self.flow_noise_text_entry.config(state="normal")
             flow_noise_text = self.flow_noise_text_var.get()
-        else:
+            flow_noise_text = flow_noise_text + "."
+        else:   
+            self.flow_noise_text_entry.config(state="disabled")
             flow_noise_text = "Keine Strömungsgeräusche."
 
         # Ödeme
         if self.edema_var.get() == "Ja":
             edema_text = self.edema_text_var.get()
+            edema_text = edema_text + "."
         else:
             edema_text = "Keine preipheren Ödeme. Kardinal kompensiert."
 
         # Auskultation Lunge
         if self.lung_abnormal_var.get() == "Ja":
+            self.lung_text_entry.config(state="normal")
             lung_text = self.lung_text_var.get()
+            lung_text = lung_text + "."
         else:
+            self.lung_text_entry.config(state="disabled")
             lung_text = "Pulmo mit VAG beidseits, keine Rasselgeräusche."
 
         # Auskultation Herz
         if self.heart_rhythm_var.get() == "Cor":
             heart_text = "Cor rhytmisch."
             self.heart_rhythm_text_entry.config(state="disabled")
-
         else:
             heart_text = f"Arrhytmisch, {self.heart_rhythm_text_var.get()}"
+            heart_text = heart_text + "."
             self.heart_rhythm_text_entry.config(state="normal")
 
         if self.heart_pathology_var.get() == "Ja":
             pathology_text = self.heart_pathology_text_var.get()
+            pathology_text = pathology_text + "."
         else:
-            pathology_text = "keine pathologischen Nebentöne."
+            pathology_text = "Keine pathologischen Nebentöne."
+
 
         # Generiere den Text
         physical_examination_text = (
