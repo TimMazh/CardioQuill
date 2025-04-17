@@ -22,6 +22,7 @@ from GUI.recommended_procedure_section import RecommendedProcedureSection
 from GUI.anamnesis_section import AnamnesisSection
 from GUI.previous_medication import PreviousMedicationSection
 from GUI.physical_examination_section import PhysicalExaminationSection
+from GUI.ecg_analysis_section import ECGAnalysisSection
 
 class CardioVistaApp:
     def __init__(self, root):
@@ -188,6 +189,7 @@ class CardioVistaApp:
         anamnesis_tab = ttk.Frame(self.notebook, padding=10)
         previous_medication_tab = ttk.Frame(self.notebook, padding=10) 
         physical_examination_tab = ttk.Frame(self.notebook, padding=10) 
+        ecg_analysis_tab = ttk.Frame(self.notebook, padding=10)
 
         
         
@@ -231,6 +233,10 @@ class CardioVistaApp:
         # Physical Examination Tab
         self.physical_examination_section = PhysicalExaminationSection(self.notebook, physical_examination_tab, self.doctors_letter)
         self.physical_examination_section.create_physical_examination_tab()
+
+        # ecg analysis tab
+        self.ecg_analysis_section = ECGAnalysisSection(self.notebook, ecg_analysis_tab, self.doctors_letter)
+        self.ecg_analysis_section.create_ecg_analysis_tab()
 
         # Bottom section for controls and status
         control_frame = ttk.Frame(self.root)
