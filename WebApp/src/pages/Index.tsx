@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MasterDataSection } from "@/components/MasterDataSection";
 import { TextSection } from "@/components/TextSection"; 
 import { ECGAnalysisSection } from "@/components/ECGAnalysisSection";
+import { ErgometrySection } from "@/components/ErgometrySection";
 import { IntroSection } from "@/components/IntroSection";
 import { PhysicalExaminationSection } from "@/components/PhysicalExaminationSection";
 import { ControlPanel } from "@/components/ControlPanel";
@@ -150,9 +151,9 @@ const Index = () => {
         </header>
         
         <Tabs defaultValue="master-data" onValueChange={handleTabChange}>
-          <TabsList className="mb-6 flex-wrap">
+          <TabsList className="mb-4 flex flex-wrap gap-2">
             <TabsTrigger value="master-data">Stammdaten</TabsTrigger>
-            <TabsTrigger value="intro">Einleitungstext</TabsTrigger>
+            <TabsTrigger value="intro">Einleitung</TabsTrigger>
             <TabsTrigger value="diagnosis">Diagnose</TabsTrigger>
             <TabsTrigger value="risk-factors">Kardiovaskuläre Risikofaktoren</TabsTrigger>
             <TabsTrigger value="secondary-diagnosis">Nebendiagnosen</TabsTrigger>
@@ -160,9 +161,9 @@ const Index = () => {
             <TabsTrigger value="anamnesis">Anamnese</TabsTrigger>
             <TabsTrigger value="previous-medication">Vormedikation</TabsTrigger>
             <TabsTrigger value="physical-examination">Körperliche Untersuchung</TabsTrigger>
-            <TabsTrigger value="ecg-analysis">EKG-Analyse</TabsTrigger>
-            <TabsTrigger value="transthoracic-echocardiography">Transthoräkische Echokardiographie</TabsTrigger>
-
+            <TabsTrigger value="ecg-analysis">EKG-Auswertung</TabsTrigger>
+            <TabsTrigger value="transthoracic-echocardiography">Echo</TabsTrigger>
+            <TabsTrigger value="ergometry">Ergometrie</TabsTrigger>
           </TabsList>
           
           <div className="space-y-4">
@@ -256,6 +257,13 @@ const Index = () => {
             
             <TabsContent value="transthoracic-echocardiography">
               <TransthoracicEchocardiographySection
+                doctorsLetter={doctorsLetter}
+                updateDoctorsLetter={updateDoctorsLetter}
+              />
+            </TabsContent>
+
+            <TabsContent value="ergometry">
+              <ErgometrySection
                 doctorsLetter={doctorsLetter}
                 updateDoctorsLetter={updateDoctorsLetter}
               />
