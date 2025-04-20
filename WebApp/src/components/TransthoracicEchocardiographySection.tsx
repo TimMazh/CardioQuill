@@ -102,7 +102,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       `${mitralValveOut} ${tricuspidValveOut} ${aorticValveOut} ${pulmonalValveOut} ` +
       `${pulmPressureOut}. ${pericardEffusionOut}. ${pleuralEffusionOut}. Vmax ${vmax} m/s, DP max ${dpMax} mmHg, DP mean ${dpMean} mmHg.`;
     setOutputText(text);
-    updateDoctorsLetter({ tte: text });
+    updateDoctorsLetter({ transthoracicEchocardiography: text });
   }, [lvNormal, lvText, ivsd, lvedd, lvpwd, lvMassIndex, rwt, lvSysNormal, lvSysText, lvef, glStrain, aortenanulus, aortensinus, aortaAsc, rvNormal, rvText, rvBasal, rvSysNormal, rvSysText, tapse, atriaNormal, atriaText, lavi, ravi, relaxationDisorder, relaxationText, ee, valvePathology, mitralValve, tricuspidValve, pulmonalValve, aorticValve, pulmPressure, pulmPressureText, pericardEffusion, pericardEffusionText, pleuralEffusion, pleuralEffusionText, vmax, dpMax, dpMean]);
 
   return (
