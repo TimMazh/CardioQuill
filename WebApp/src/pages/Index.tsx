@@ -12,6 +12,7 @@ import { PythonBackendInfo } from "@/components/PythonBackendInfo";
 import { DoctorsLetter, ServerStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/mockBackend";
+import { TransthoracicEchocardiographySection } from "@/components/TransthoracicEchocardiographySection";
 
 const Index = () => {
   const { toast } = useToast();
@@ -160,6 +161,8 @@ const Index = () => {
             <TabsTrigger value="previous-medication">Vormedikation</TabsTrigger>
             <TabsTrigger value="physical-examination">Körperliche Untersuchung</TabsTrigger>
             <TabsTrigger value="ecg-analysis">EKG-Analyse</TabsTrigger>
+            <TabsTrigger value="transthoracic-echocardiography">Transthoräkische Echokardiographie</TabsTrigger>
+
           </TabsList>
           
           <div className="space-y-4">
@@ -248,6 +251,13 @@ const Index = () => {
               <ECGAnalysisSection 
                 doctorsLetter={doctorsLetter} 
                 updateDoctorsLetter={updateDoctorsLetter} 
+              />
+            </TabsContent>
+            
+            <TabsContent value="transthoracic-echocardiography">
+              <TransthoracicEchocardiographySection
+                doctorsLetter={doctorsLetter}
+                updateDoctorsLetter={updateDoctorsLetter}
               />
             </TabsContent>
           </div>
