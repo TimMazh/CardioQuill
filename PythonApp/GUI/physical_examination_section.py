@@ -17,11 +17,11 @@ class PhysicalExaminationSection:
         main_frame = ttk.Frame(self.physical_examination_tab)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5, 2))  # Vollständige horizontale Ausdehnung
 
-        # Konfiguration des Grid-Layouts für gleichmäßige Verteilung
+        # Konfiguration des Grid-Layouts für gleichmässige Verteilung
         main_frame.columnconfigure(0, weight=1)  # Linke Spalte
         main_frame.columnconfigure(1, weight=1)  # Rechte Spalte
 
-        # Linke Spalte: Allgemeinzustand, Körpermaße und Blutdruck
+        # Linke Spalte: Allgemeinzustand, Körpermasse und Blutdruck
         left_column = ttk.Frame(main_frame)
         left_column.grid(row=0, column=0, padx=10, pady=10, sticky=tk.NSEW)
 
@@ -41,8 +41,8 @@ class PhysicalExaminationSection:
 
         ttk.Combobox(az_ez_frame, textvariable=self.ez_var, values=["normaler", "übergewichtiger", "adipöser"], state="readonly").grid(row=1, column=1, padx=5, pady=5)
 
-        # Körpermaße und Blutdruck
-        measurements_frame = ttk.LabelFrame(left_column, text="Körpermaße und Blutdruck", padding=10)
+        # Körpermasse und Blutdruck
+        measurements_frame = ttk.LabelFrame(left_column, text="Körpermasse und Blutdruck", padding=10)
         measurements_frame.pack(fill=tk.X, padx=5, pady=2)
 
         self.height_var = tk.StringVar()
@@ -69,7 +69,7 @@ class PhysicalExaminationSection:
         self.pulse_var = tk.StringVar()
         self.pulse_var.trace_add("write", lambda *args: self.update_physical_examination_text())
 
-        ttk.Label(measurements_frame, text="Körpergröße (cm):").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+        ttk.Label(measurements_frame, text="Körpergrösse (cm):").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
         ttk.Entry(measurements_frame, textvariable=self.height_var).grid(row=0, column=1, padx=5, pady=5)
 
         ttk.Label(measurements_frame, text="Körpergewicht (kg):").grid(row=1, column=0, padx=5, pady=5, sticky=tk.W)
@@ -240,7 +240,7 @@ class PhysicalExaminationSection:
         az = self.az_var.get()
         ez = self.ez_var.get()
 
-        # Körpermaße und Blutdruck
+        # Körpermasse und Blutdruck
         height = self.height_var.get()
         weight = self.weight_var.get()
         bmi = self.bmi_var.get()
@@ -335,7 +335,7 @@ class PhysicalExaminationSection:
 
         # Generiere den Text
         physical_examination_text = (
-            f"{az} AZ und {ez} EZ. Körpergröße {height} cm, Körpergewicht {weight} kg, BMI {bmi} kg/m². "
+            f"{az} AZ und {ez} EZ. Körpergrösse {height} cm, Körpergewicht {weight} kg, BMI {bmi} kg/m². "
             f"Blutdruck in Ruhe links {bp_left_sys}/{bp_left_dia} mmHg, rechts {bp_right_sys}/{bp_right_dia} mmHg, {side_difference}. "
             f"Ruhepuls {pulse}/min. {lung_text} {heart_text} {pathology_text} {pulse_text} {flow_noise_text} {edema_text}"
         )

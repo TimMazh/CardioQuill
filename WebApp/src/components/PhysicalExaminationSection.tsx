@@ -56,8 +56,10 @@ export function PhysicalExaminationSection({
     // Basic measurements
     let examinationText = `${az} AZ und ${ez} EZ. `;
     
-    if (height && weight && bmi) {
-      examinationText += `Körpergröße ${height} cm, Körpergewicht ${weight} kg, BMI ${bmi} kg/m². `;
+    if (height && weight) {
+      let bmi = (parseFloat(weight) / (parseFloat(height) ** 2)*10000).toFixed(1).toString();
+      setBMI(bmi);
+      examinationText += `Körpergrösse ${height} cm, Körpergewicht ${weight} kg, BMI ${bmi} kg/m². `;
     }
     
     // Blood pressure
@@ -147,102 +149,30 @@ export function PhysicalExaminationSection({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Left Column */}
-      <div className="space-y-4">
-        {/* General condition */}
+      {/* Linke Spalte: Körpermasse und Blutdruck */}
+      <div>
         <Card>
           <CardHeader>
-            <CardTitle>Allgemein- und Ernährungszustand</CardTitle>
+            <CardTitle>Körpermasse und Blutdruck</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label htmlFor="az">AZ:</Label>
-              </div>
-              <div className="col-span-2">
-                <Select value={az} onValueChange={setAZ}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Allgemeinzustand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Guter">Guter</SelectItem>
-                    <SelectItem value="Normaler">Normaler</SelectItem>
-                    <SelectItem value="Schlechter">Schlechter</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <Label htmlFor="height">Körpergrösse (cm):</Label>
+            <Input 
+              id="height" 
+              value={height} 
+              onChange={(e) => setHeight(e.target.value)} 
+            />
+            <div className="space-y-4">
+              <Label htmlFor="weight">Körpergewicht (kg):</Label>
+              <Input 
+                id="weight" 
+                value={weight} 
+                onChange={(e) => setWeight(e.target.value)} 
+              />
             </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label htmlFor="ez">EZ:</Label>
-              </div>
-              <div className="col-span-2">
-                <Select value={ez} onValueChange={setEZ}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Ernährungszustand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="normaler">normaler</SelectItem>
-                    <SelectItem value="übergewichtiger">übergewichtiger</SelectItem>
-                    <SelectItem value="adipöser">adipöser</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Body measurements */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Körpermaße und Blutdruck</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label htmlFor="height">Körpergröße (cm):</Label>
-              </div>
-              <div className="col-span-2">
-                <Input 
-                  id="height" 
-                  value={height} 
-                  onChange={(e) => setHeight(e.target.value)} 
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label htmlFor="weight">Körpergewicht (kg):</Label>
-              </div>
-              <div className="col-span-2">
-                <Input 
-                  id="weight" 
-                  value={weight} 
-                  onChange={(e) => setWeight(e.target.value)} 
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label htmlFor="bmi">BMI (kg/m²):</Label>
-              </div>
-              <div className="col-span-2">
-                <Input 
-                  id="bmi" 
-                  value={bmi} 
-                  onChange={(e) => setBMI(e.target.value)} 
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label>Blutdruck links:</Label>
-              </div>
-              <div className="col-span-2 flex space-x-2">
+            <div className="space-y-4">
+              <Label>Blutdruck links:</Label>
+              <div className="flex space-x-2">
                 <Input 
                   placeholder="Systolisch" 
                   value={bpLeftSys} 
@@ -255,12 +185,9 @@ export function PhysicalExaminationSection({
                 />
               </div>
             </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label>Blutdruck rechts:</Label>
-              </div>
-              <div className="col-span-2 flex space-x-2">
+            <div className="space-y-4">
+              <Label>Blutdruck rechts:</Label>
+              <div className="flex space-x-2">
                 <Input 
                   placeholder="Systolisch" 
                   value={bpRightSys} 
@@ -273,122 +200,128 @@ export function PhysicalExaminationSection({
                 />
               </div>
             </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label>Seitendifferenz:</Label>
-              </div>
-              <div className="col-span-2">
-                <RadioGroup 
-                  value={hasBPSideDifference ? "yes" : "no"}
-                  onValueChange={(v) => setHasBPSideDifference(v === "yes")}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="bp-diff-yes" />
-                    <Label htmlFor="bp-diff-yes">Ja</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="bp-diff-no" />
-                    <Label htmlFor="bp-diff-no">Nein</Label>
-                  </div>
-                </RadioGroup>
-              </div>
+            <div className="space-y-4">
+              <Label>Seitendifferenz:</Label>
+              <RadioGroup 
+                value={hasBPSideDifference ? "yes" : "no"}
+                onValueChange={(v) => setHasBPSideDifference(v === "yes")}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="bp-diff-yes" />
+                  <Label htmlFor="bp-diff-yes">Ja</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="bp-diff-no" />
+                  <Label htmlFor="bp-diff-no">Nein</Label>
+                </div>
+              </RadioGroup>
             </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label htmlFor="pulse">Ruhepuls (min):</Label>
-              </div>
-              <div className="col-span-2">
-                <Input 
-                  id="pulse" 
-                  value={pulse} 
-                  onChange={(e) => setPulse(e.target.value)} 
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Lung */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Auskultation Lunge</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label>Auskultation Lunge abnormal?</Label>
-              </div>
-              <div className="col-span-2">
-                <RadioGroup 
-                  value={lungAbnormal ? "yes" : "no"}
-                  onValueChange={(v) => setLungAbnormal(v === "yes")}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="lung-abnormal-yes" />
-                    <Label htmlFor="lung-abnormal-yes">Ja</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="lung-abnormal-no" />
-                    <Label htmlFor="lung-abnormal-no">Nein</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-            
-            {lungAbnormal && (
+            <div className="space-y-4">
+              <Label htmlFor="pulse">Ruhepuls (min):</Label>
               <Input 
-                placeholder="Beschreibung der Auffälligkeiten" 
-                value={lungDetails} 
-                onChange={(e) => setLungDetails(e.target.value)} 
+                id="pulse" 
+                value={pulse} 
+                onChange={(e) => setPulse(e.target.value)} 
               />
-            )}
+            </div>
           </CardContent>
         </Card>
       </div>
       
-      {/* Right Column */}
-      <div className="space-y-4">
-        {/* Heart */}
-        <Card>
+      {/* Rechte Spalte: 2x2 Grid */}
+      <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Obere Reihe */}
+          <Card className="col-span-1">
+            <CardHeader>
+              <CardTitle>Allgemein- und Ernährungszustand</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Label htmlFor="az">Allgemeinzustand:</Label>
+              <Select value={az} onValueChange={setAZ}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Allgemeinzustand" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Guter">Guter</SelectItem>
+                  <SelectItem value="Normaler">Normaler</SelectItem>
+                  <SelectItem value="Schlechter">Schlechter</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="space-y-4">
+                <Label htmlFor="ez">Ernährungszustand:</Label>
+                <Select value={ez} onValueChange={setEZ}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Ernährungszustand" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normaler">Normaler</SelectItem>
+                    <SelectItem value="übergewichtiger">Übergewichtiger</SelectItem>
+                    <SelectItem value="adipöser">Adipöser</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Auskultation Herz</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label>Herzrhythmus:</Label>
-              </div>
-              <div className="col-span-2">
-                <RadioGroup 
-                  value={heartRhythm}
-                  onValueChange={setHeartRhythm}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Cor rhythmisch" id="heart-rhythm-normal" />
-                    <Label htmlFor="heart-rhythm-normal">Cor rhythmisch</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Arrhythmisch" id="heart-rhythm-arrythmic" />
-                    <Label htmlFor="heart-rhythm-arrythmic">Arrhythmisch</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-            {heartRhythm === "Arrhythmisch" && (
-              <Input 
-                placeholder="Beschreibung des Rhytmus" 
-                value={heartRhythmDetails} 
-                onChange={(e) => setHeartRhythmDetails(e.target.value)} 
-              />
-            )}
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
+              <CardTitle>Auskultation Lunge</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Label>Auskultation Lunge abnormal?</Label>
+              <RadioGroup 
+                value={lungAbnormal ? "yes" : "no"}
+                onValueChange={(v) => setLungAbnormal(v === "yes")}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="lung-abnormal-yes" />
+                  <Label htmlFor="lung-abnormal-yes">Ja</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="lung-abnormal-no" />
+                  <Label htmlFor="lung-abnormal-no">Nein</Label>
+                </div>
+              </RadioGroup>
+              {lungAbnormal && (
+                <Textarea 
+                  className="min-h-[40px] mt-2"
+                  placeholder="Beschreibung der Auffälligkeiten" 
+                  value={lungDetails} 
+                  onChange={(e) => setLungDetails(e.target.value)} 
+                />
+              )}
+            </CardContent>
+          </Card>
+          {/* Untere Reihe */}
+          <Card className="col-span-1">
+            <CardHeader>
+              <CardTitle>Auskultation Herz</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Label>Herzrhythmus:</Label>
+              <RadioGroup 
+                value={heartRhythm}
+                onValueChange={setHeartRhythm}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Cor rhythmisch" id="heart-rhythm-normal" />
+                  <Label htmlFor="heart-rhythm-normal">Cor rhythmisch</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Arrhythmisch" id="heart-rhythm-arrythmic" />
+                  <Label htmlFor="heart-rhythm-arrythmic">Arrhythmisch</Label>
+                </div>
+              </RadioGroup>
+              {heartRhythm === "Arrhythmisch" && (
+                <Textarea 
+                  className="min-h-[40px] mt-2"
+                  placeholder="Beschreibung des Rhytmus" 
+                  value={heartRhythmDetails} 
+                  onChange={(e) => setHeartRhythmDetails(e.target.value)} 
+                />
+              )}
+              <div className="space-y-4">
                 <Label>Pathologische Nebentöne:</Label>
-              </div>
-              <div className="col-span-2">
                 <RadioGroup 
                   value={hasHeartPathology ? "yes" : "no"}
                   onValueChange={(v) => setHasHeartPathology(v === "yes")}
@@ -402,59 +335,46 @@ export function PhysicalExaminationSection({
                     <Label htmlFor="heart-pathology-no">Nein</Label>
                   </div>
                 </RadioGroup>
+                {hasHeartPathology && (
+                  <Textarea 
+                    className="min-h-[40px] mt-2"
+                    placeholder="Beschreibung der Nebentöne" 
+                    value={heartPathology} 
+                    onChange={(e) => setHeartPathology(e.target.value)} 
+                  />
+                )}
               </div>
-            </div>
-            
-            {hasHeartPathology && (
-              <Input 
-                placeholder="Beschreibung der Nebentöne" 
-                value={heartPathology} 
-                onChange={(e) => setHeartPathology(e.target.value)} 
-              />
-            )}
-          </CardContent>
-        </Card>
-        
-        {/* Pulses */}
-        <Card>
+            </CardContent>
+          </Card>
+          <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Pulse</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
-                <Label>Pulse allseits gut tastbar:</Label>
-              </div>
-              <div className="col-span-2">
-                <RadioGroup 
-                  value={pulseStatus === "normal" ? "yes" : "no"}
-                  onValueChange={(v) => setPulseStatus(v === "yes" ? "normal" : "")}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="pulse-normal-yes" />
-                    <Label htmlFor="pulse-normal-yes">Ja</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="pulse-normal-no" />
-                    <Label htmlFor="pulse-normal-no">Nein</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-            
-            {pulseStatus !== "normal" && (
-              <Input 
-                placeholder="Beschreibung der Pulse" 
-                value={pulseStatus} 
-                onChange={(e) => setPulseStatus(e.target.value)} 
-              />
-            )}
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
+              <CardTitle>Pulse</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Label>Pulse allseits gut tastbar:</Label>
+              <RadioGroup 
+                value={pulseStatus === "normal" ? "yes" : "no"}
+                onValueChange={(v) => setPulseStatus(v === "yes" ? "normal" : "")}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="pulse-normal-yes" />
+                  <Label htmlFor="pulse-normal-yes">Ja</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="pulse-normal-no" />
+                  <Label htmlFor="pulse-normal-no">Nein</Label>
+                </div>
+              </RadioGroup>
+              {pulseStatus !== "normal" && (
+                <Textarea 
+                className="min-h-[40px] mt-2" 
+                  placeholder="Beschreibung der Pulse" 
+                  value={pulseStatus} 
+                  onChange={(e) => setPulseStatus(e.target.value)} 
+                />
+              )}
+              <div className="space-y-4">
                 <Label>Strömungsgeräusche:</Label>
-              </div>
-              <div className="col-span-2">
                 <RadioGroup 
                   value={flowNoise ? "yes" : "no"}
                   onValueChange={(v) => setFlowNoise(v === "yes")}
@@ -468,22 +388,17 @@ export function PhysicalExaminationSection({
                     <Label htmlFor="flow-noise-no">Nein</Label>
                   </div>
                 </RadioGroup>
+                {flowNoise && (
+                  <Textarea 
+                  className="min-h-[40px] mt-2"
+                    placeholder="Beschreibung der Strömungsgeräusche" 
+                    value={flowNoiseDetails} 
+                    onChange={(e) => setFlowNoiseDetails(e.target.value)} 
+                  />
+                )}
               </div>
-            </div>
-            
-            {flowNoise && (
-              <Input 
-                placeholder="Beschreibung der Strömungsgeräusche" 
-                value={flowNoiseDetails} 
-                onChange={(e) => setFlowNoiseDetails(e.target.value)} 
-              />
-            )}
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-1">
+              <div className="space-y-4">
                 <Label>Ödeme:</Label>
-              </div>
-              <div className="col-span-2">
                 <RadioGroup 
                   value={edema ? "yes" : "no"}
                   onValueChange={(v) => setEdema(v === "yes")}
@@ -497,18 +412,18 @@ export function PhysicalExaminationSection({
                     <Label htmlFor="edema-no">Nein</Label>
                   </div>
                 </RadioGroup>
+                {edema && (
+                  <Textarea 
+                  className="min-h-[40px] mt-2"
+                    placeholder="Beschreibung der Ödeme" 
+                    value={edemaDetails} 
+                    onChange={(e) => setEdemaDetails(e.target.value)} 
+                  />
+                )}
               </div>
-            </div>
-            
-            {edema && (
-              <Input 
-                placeholder="Beschreibung der Ödeme" 
-                value={edemaDetails} 
-                onChange={(e) => setEdemaDetails(e.target.value)} 
-              />
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
       
       {/* Full width text output */}
