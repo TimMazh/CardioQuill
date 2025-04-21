@@ -34,6 +34,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
   const [rProgression, setRProgression] = useState("yes");
   const [rProgressionText, setRProgressionText] = useState("");
   const [rhythmContinuity, setRhythmContinuity] = useState("durchgehend");
+  const [rhythmContinuityText, setRhythmContinuityText] = useState("");
   const [rhythmFrequency, setRhythmFrequency] = useState("normofrequent");
   const [extrasystole, setExtrasystole] = useState("no");
   const [extrasystoleFrequency, setExtrasystoleFrequency] = useState("vereinzelt");
@@ -49,7 +50,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     sinusRate, lagetyp, pq, qrs, qtc, pathologicalQ, qWaveLeads, 
     stChanges, stChangesText, rProgression, rProgressionText,
     rhythmContinuity, rhythmFrequency, extrasystole, 
-    extrasystoleFrequency, extrasystoleTypes
+    extrasystoleFrequency, extrasystoleTypes, rhythmContinuityText
   ]);
   
   // Toggle leads selection for pathological Q
@@ -74,7 +75,24 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
   const updateECGAnalysisText = () => {
     // Sinusrhythmus und Lagetyp
     const sinus = sinusRate ? `Sinusrhythmus mit ${sinusRate}/Minute.` : "Sinusrhythmus.";
-    const lage = `${lagetyp}.`;
+    let lage = `${lagetyp}.`;
+    if (lagetyp == "Überdrehter Linkstyp") {
+      lage = `Überdrehter Links Lagetyp.`;
+    } else if(lagetyp == "Linkstyp") {
+      lage = `Links Lagetyp.`;
+    } else if(lagetyp == "Horizontaltyp") {
+      lage = `Horizontal Lagetyp.`;
+    } else if(lagetyp == "Indifferenztyp") {
+      lage = `Indifferenz Lagetyp.`;
+    } else if(lagetyp == "Steiltyp") {
+      lage = `Steil Lagetyp.`;
+    } else if(lagetyp == "Rechtstyp") {
+      lage = `Rechts Lagetyp.`;
+    } else if(lagetyp == "Überdrehter Rechtstyp") {
+      lage = `Überdrehter Rechts Lagetyp.`;
+    } else {
+      lage = "Lagetyp nicht definiert.";
+    }
 
     // Intervalle
     const intervals = `${pq ? `PQ ${pq}ms,` : ""} ${qrs ? `QRS ${qrs}ms,` : ""} ${qtc ? `QTc ${qtc}ms.` : ""}`;
@@ -82,7 +100,13 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     // Pathologisches Q
     let qWaveText = "";
     if (pathologicalQ === "yes" && qWaveLeads.length > 0) {
-      qWaveText = `Pathologische Q-Welle in ${qWaveLeads.join(", ")}.`;
+
+      const sortedLeads = qWaveLeads.sort((a, b) => {
+        const leadOrder = ["I", "II", "III", "aVF", "aVR", "aVL", "V1", "V2", "V3", "V4", "V5", "V6"];
+        return leadOrder.indexOf(a) - leadOrder.indexOf(b);
+      });
+
+      qWaveText = `Pathologische Q-Welle in ${sortedLeads.join(", ")}.`;
     } else {
       qWaveText = "Kein pathologisches Q.";
     }
@@ -104,7 +128,11 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     }
 
     // Rhythmusstreifen
-    const rhythmStripText = `Im Rhythmusstreifen ${rhythmContinuity} ${rhythmFrequency}er Sinusrhythmus.`;
+    let rhythmStripText = `Im Rhythmusstreifen ${rhythmContinuity} ${rhythmFrequency}er Sinusrhythmus.`;
+    if (rhythmContinuity === "irregulär" && rhythmContinuityText) {
+      rhythmStripText = rhythmStripText.replace(".", ":");
+      rhythmStripText += ` ${rhythmContinuityText}.`;
+    }
 
     // Extrasystolen
     let extrasystoleText = "";
@@ -226,17 +254,59 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             </div>
             
             {pathologicalQ === "yes" && (
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-                {["I", "II", "III", "aVF", "aVR", "aVL", "V1", "V2", "V3", "V4", "V5", "V6"].map((lead) => (
-                  <div key={lead} className="flex items-center space-x-2">
-                    <Checkbox 
-                      id={`lead-${lead}`} 
-                      checked={qWaveLeads.includes(lead)}
-                      onCheckedChange={() => toggleQWaveLead(lead)} 
-                    />
-                    <Label htmlFor={`lead-${lead}`}>{lead}</Label>
-                  </div>
-                ))}
+              <div className="flex flex-row gap-4">
+                {/* Gruppe 1: I, II, III */}
+                <div className="flex flex-col space-y-2">
+                  {["I", "II", "III"].map((lead) => (
+                    <div key={lead} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`lead-${lead}`} 
+                        checked={qWaveLeads.includes(lead)}
+                        onCheckedChange={() => toggleQWaveLead(lead)} 
+                      />
+                      <Label htmlFor={`lead-${lead}`}>{lead}</Label>
+                    </div>
+                  ))}
+                </div>
+                {/* Gruppe 2: aVF, aVR, aVL */}
+                <div className="flex flex-col space-y-2">
+                  {["aVF", "aVR", "aVL"].map((lead) => (
+                    <div key={lead} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`lead-${lead}`} 
+                        checked={qWaveLeads.includes(lead)}
+                        onCheckedChange={() => toggleQWaveLead(lead)} 
+                      />
+                      <Label htmlFor={`lead-${lead}`}>{lead}</Label>
+                    </div>
+                  ))}
+                </div>
+                {/* Gruppe 3: V1, V2, V3 */}
+                <div className="flex flex-col space-y-2">
+                  {["V1", "V2", "V3"].map((lead) => (
+                    <div key={lead} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`lead-${lead}`} 
+                        checked={qWaveLeads.includes(lead)}
+                        onCheckedChange={() => toggleQWaveLead(lead)} 
+                      />
+                      <Label htmlFor={`lead-${lead}`}>{lead}</Label>
+                    </div>
+                  ))}
+                </div>
+                {/* Gruppe 4: V4, V5, V6 */}
+                <div className="flex flex-col space-y-2">
+                  {["V4", "V5", "V6"].map((lead) => (
+                    <div key={lead} className="flex items-center space-x-2">
+                      <Checkbox 
+                        id={`lead-${lead}`} 
+                        checked={qWaveLeads.includes(lead)}
+                        onCheckedChange={() => toggleQWaveLead(lead)} 
+                      />
+                      <Label htmlFor={`lead-${lead}`}>{lead}</Label>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -329,9 +399,17 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="durchgehend">durchgehend</SelectItem>
-                  <SelectItem value="nicht durchgehend">nicht durchgehend</SelectItem>
+                  <SelectItem value="irregulär">irregulär</SelectItem>
                 </SelectContent>
               </Select>
+              {rhythmContinuity === "irregulär" && (
+                <Input
+                  value={rhythmContinuityText}
+                  onChange={e => setRhythmContinuityText(e.target.value)}
+                  placeholder="Freitext zur irregulären Kontinuität..."
+                  className="mt-2"
+                />
+              )}
             </div>
             
             <div className="space-y-2">
