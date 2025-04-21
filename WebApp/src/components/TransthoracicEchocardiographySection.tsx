@@ -81,10 +81,11 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
     let pulmonalValveOut = "";
     let aorticValveOut = "";
     if (valvePathology === "yes") {
-      mitralValveOut = mitralValve === "" || mitralValve === "Keine" ? "Keine Mitralklappeninsuffizienz oder Stenose." : `Mitralklappe: ${mitralValve}.`;
-      tricuspidValveOut = tricuspidValve === "" || tricuspidValve === "Keine" ? "Keine Trikuspidalklappeninsuffizienz oder Stenose." : `Trikuspidalklappe: ${tricuspidValve}.`;
-      pulmonalValveOut = pulmonalValve === "" || pulmonalValve === "Keine" ? "Keine Pulmonalklappeninsuffizienz oder Stenose." : `Pulmonalklappe: ${pulmonalValve}.`;
-      aorticValveOut = aorticValve === "" || aorticValve === "Keine" ? "Keine Aortenklappeninsuffizienz oder Stenose." : `Aortenklappe: ${aorticValve}.`;
+      
+      mitralValveOut = mitralValve === "" || mitralValve === "Keine" ? "Keine Mitralklappeninsuffizienz oder Stenose." : `Mitralklappen${mitralValve.toLowerCase()}.`;
+      tricuspidValveOut = tricuspidValve === "" || tricuspidValve === "Keine" ? "Keine Trikuspidalklappeninsuffizienz oder Stenose." : `Trikuspidalklappe${tricuspidValve.toLowerCase()}.`;
+      pulmonalValveOut = pulmonalValve === "" || pulmonalValve === "Keine" ? "Keine Pulmonalklappeninsuffizienz oder Stenose." : `Pulmonalklappe${pulmonalValve.toLowerCase()}.`;
+      aorticValveOut = aorticValve === "" || aorticValve === "Keine" ? "Keine Aortenklappeninsuffizienz oder Stenose." : `Aortenklappe${aorticValve.toLowerCase()}.`;
     } else {
       mitralValveOut = "Keine Mitralklappeninsuffizienz oder Stenose.";
       tricuspidValveOut = "Keine Trikuspidalklappeninsuffizienz oder Stenose.";
@@ -99,7 +100,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       `${lvSysTextOut}. LVEF ${lvef}%. GL Strain ${glStrain}%. Aortenanulus ${aortenanulus} mm, Aortensinus ${aortensinus} mm, Aorta ascendens ${aortaAsc} mm. ` +
       `Rechter Ventrikel ${rvTextOut}. RV basal ${rvBasal} mm. ${rvSysTextOut}. TAPSE ${tapse} mm. ` +
       `${atriaTextOut}. LAVI ${lavi} ml/m2, RAVI ${ravi} ml/m2. ${relaxationTextOut}. E/E' ${ee}. ` +
-      `${mitralValveOut} ${tricuspidValveOut} ${aorticValveOut} ${pulmonalValveOut} ` +
+      `${mitralValveOut} ${tricuspidValveOut} ${pulmonalValveOut} ${aorticValveOut} ` +
       `${pulmPressureOut}. ${pericardEffusionOut}. ${pleuralEffusionOut}. Vmax ${vmax} m/s, DP max ${dpMax} mmHg, DP mean ${dpMean} mmHg.`;
     setOutputText(text);
     updateDoctorsLetter({ transthoracicEchocardiography: text });
@@ -379,12 +380,13 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                     <Label>Mitralklappe</Label>
                     <Select value={mitralValve} onValueChange={setMitralValve}>
                       <SelectTrigger id="mitral-valve">
-                        <SelectValue placeholder="Auswahl" />
+                        <SelectValue placeholder="Keine" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Keine">Keine</SelectItem>
                         <SelectItem value="Stenose">Stenose</SelectItem>
                         <SelectItem value="Insuffizienz">Insuffizienz</SelectItem>
+                        <SelectItem value="Stenose und -insuffizienz">Stenose und Insuffizienz</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -392,12 +394,13 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                     <Label>Trikuspidalklappe</Label>
                     <Select value={tricuspidValve} onValueChange={setTricuspidValve}>
                       <SelectTrigger id="tricuspid-valve">
-                        <SelectValue placeholder="Auswahl" />
+                        <SelectValue placeholder="Keine" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Keine">Keine</SelectItem>
                         <SelectItem value="Stenose">Stenose</SelectItem>
                         <SelectItem value="Insuffizienz">Insuffizienz</SelectItem>
+                        <SelectItem value="Stenose und -insuffizienz">Stenose und Insuffizienz</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -405,12 +408,13 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                     <Label>Pulmonalklappe</Label>
                     <Select value={pulmonalValve} onValueChange={setPulmonalValve}>
                       <SelectTrigger id="pulmonal-valve">
-                        <SelectValue placeholder="Auswahl" />
+                        <SelectValue placeholder="Keine" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Keine">Keine</SelectItem>
                         <SelectItem value="Stenose">Stenose</SelectItem>
                         <SelectItem value="Insuffizienz">Insuffizienz</SelectItem>
+                        <SelectItem value="Stenose und -insuffizienz">Stenose und Insuffizienz</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -418,12 +422,13 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                     <Label>Aortenklappe</Label>
                     <Select value={aorticValve} onValueChange={setAorticValve}>
                       <SelectTrigger id="aortic-valve">
-                        <SelectValue placeholder="Auswahl" />
+                        <SelectValue placeholder="Keine" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Keine">Keine</SelectItem>
                         <SelectItem value="Stenose">Stenose</SelectItem>
                         <SelectItem value="Insuffizienz">Insuffizienz</SelectItem>
+                        <SelectItem value="Stenose und -insuffizienz">Stenose und Insuffizienz</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
