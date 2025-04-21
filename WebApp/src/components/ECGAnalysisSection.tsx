@@ -141,7 +141,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
       const types = extrasystoleTypes.length > 0 
         ? extrasystoleTypes.join(" und ") 
         : "unbestimmter Typ";
-      extrasystoleText = `${frequency === "vereinzelt" ? "Vereinzelt" : "Regelmäßig"} ${types}e Extrasystolen.`;
+      extrasystoleText = `${frequency === "vereinzelt" ? "Vereinzelt" : "Regelmässig"} ${types}e Extrasystolen.`;
     } else {
       extrasystoleText = "Keine Extrasystolen.";
     }
@@ -196,44 +196,46 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
           </div>
         </div>
         
-        {/* Intervalle */}
-        <div className="bg-background p-4 rounded-md border">
-          <h3 className="text-lg font-medium mb-4">Intervalle</h3>
+        
+      
+      {/* Intervalle */}
+      <div className="bg-background p-4 rounded-md border">
+        <h3 className="text-lg font-medium mb-4">Intervalle</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="pq">PQ (ms):</Label>
+            <Input 
+              id="pq" 
+              value={pq} 
+              onChange={(e) => setPQ(e.target.value)}
+            />
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="pq">PQ (ms):</Label>
-              <Input 
-                id="pq" 
-                value={pq} 
-                onChange={(e) => setPQ(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="qrs">QRS (ms):</Label>
-              <Input 
-                id="qrs" 
-                value={qrs} 
-                onChange={(e) => setQRS(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="qtc">QTc (ms):</Label>
-              <Input 
-                id="qtc" 
-                value={qtc} 
-                onChange={(e) => setQTC(e.target.value)}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="qrs">QRS (ms):</Label>
+            <Input 
+              id="qrs" 
+              value={qrs} 
+              onChange={(e) => setQRS(e.target.value)}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="qtc">QTc (ms):</Label>
+            <Input 
+              id="qtc" 
+              value={qtc} 
+              onChange={(e) => setQTC(e.target.value)}
+            />
           </div>
         </div>
-        
+      </div>
+      
+      <div className="flex flex-col md:flex-row gap-4">
         {/* Pathologisches Q */}
-        <div className="bg-background p-4 rounded-md border">
+        <div className="bg-background p-4 rounded-md border flex-1 min-w-[270px]">
           <h3 className="text-lg font-medium mb-4">Pathologisches Q</h3>
-          
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Pathologisches Q?</Label>
@@ -252,7 +254,6 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 </div>
               </RadioGroup>
             </div>
-            
             {pathologicalQ === "yes" && (
               <div className="flex flex-row gap-4">
                 {/* Gruppe 1: I, II, III */}
@@ -311,11 +312,9 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             )}
           </div>
         </div>
-        
         {/* ST-Veränderungen */}
-        <div className="bg-background p-4 rounded-md border">
+        <div className="bg-background p-4 rounded-md border flex-1 min-w-[270px]">
           <h3 className="text-lg font-medium mb-4">ST-Veränderungen</h3>
-          
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>ST-Veränderungen?</Label>
@@ -334,25 +333,19 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 </div>
               </RadioGroup>
             </div>
-            
             {stChanges === "yes" && (
-              <div className="space-y-2">
-                <Label htmlFor="stChangesText">Beschreibung:</Label>
-                <Input 
-                  id="stChangesText" 
-                  value={stChangesText} 
-                  onChange={(e) => setSTChangesText(e.target.value)}
-                  placeholder="ST-Veränderungen beschreiben..."
-                />
-              </div>
+              <Textarea 
+                className="min-h-[40px]"
+                value={stChangesText}
+                onChange={e => setSTChangesText(e.target.value)}
+                placeholder="Beschreibung der ST-Veränderungen..."
+              />
             )}
           </div>
         </div>
-        
         {/* R-Progression */}
-        <div className="bg-background p-4 rounded-md border">
+        <div className="bg-background p-4 rounded-md border flex-1 min-w-[270px]">
           <h3 className="text-lg font-medium mb-4">R-Progression</h3>
-          
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Regelrechte R-Progression?</Label>
@@ -362,36 +355,34 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="yes" id="r-yes" />
-                  <Label htmlFor="r-yes">Ja</Label>
+                  <RadioGroupItem value="yes" id="rprog-yes" />
+                  <Label htmlFor="rprog-yes">Ja</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no" id="r-no" />
-                  <Label htmlFor="r-no">Nein</Label>
+                  <RadioGroupItem value="no" id="rprog-no" />
+                  <Label htmlFor="rprog-no">Nein</Label>
                 </div>
               </RadioGroup>
             </div>
-            
             {rProgression === "no" && (
-              <div className="space-y-2">
-                <Label htmlFor="rProgressionText">Beschreibung:</Label>
-                <Input 
-                  id="rProgressionText" 
-                  value={rProgressionText} 
-                  onChange={(e) => setRProgressionText(e.target.value)}
-                  placeholder="R-Progression beschreiben..."
-                />
-              </div>
+              <Textarea 
+                className="min-h-[40px]"
+                value={rProgressionText}
+                onChange={e => setRProgressionText(e.target.value)}
+                placeholder="Beschreibung der R-Progression..."
+              />
             )}
           </div>
         </div>
-        
+      </div>
+      
+      {/* Rhythmusstreifen & Extrasystolen nebeneinander */}
+      <div className="flex flex-col md:flex-row gap-4">
         {/* Rhythmusstreifen */}
-        <div className="bg-background p-4 rounded-md border">
+        <div className="bg-background p-4 rounded-md border flex-1">
           <h3 className="text-lg font-medium mb-4">Rhythmusstreifen</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 space-y-2">
               <Label htmlFor="rhythmContinuity">Kontinuität:</Label>
               <Select value={rhythmContinuity} onValueChange={setRhythmContinuity}>
                 <SelectTrigger id="rhythmContinuity">
@@ -406,13 +397,12 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 <Input
                   value={rhythmContinuityText}
                   onChange={e => setRhythmContinuityText(e.target.value)}
-                  placeholder="Freitext zur irregulären Kontinuität..."
+                  placeholder="Beschreibung der Irregulärität..."
                   className="mt-2"
                 />
               )}
             </div>
-            
-            <div className="space-y-2">
+            <div className="flex-1 space-y-2">
               <Label htmlFor="rhythmFrequency">Frequenz:</Label>
               <Select value={rhythmFrequency} onValueChange={setRhythmFrequency}>
                 <SelectTrigger id="rhythmFrequency">
@@ -427,9 +417,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             </div>
           </div>
         </div>
-        
         {/* Extrasystolen */}
-        <div className="bg-background p-4 rounded-md border">
+        <div className="bg-background p-4 rounded-md border flex-1">
           <h3 className="text-lg font-medium mb-4">Extrasystolen</h3>
           
           <div className="space-y-4">
@@ -465,8 +454,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                       <Label htmlFor="freq-vereinzelt">Vereinzelt</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="regelmäßig" id="freq-regelmäßig" />
-                      <Label htmlFor="freq-regelmäßig">Regelmäßig</Label>
+                      <RadioGroupItem value="regelmässig" id="freq-regelmässig" />
+                      <Label htmlFor="freq-regelmässig">Regelmässig</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -496,7 +485,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             )}
           </div>
         </div>
-        
+      </div>
         {/* Generierter Text */}
         <div className="bg-background p-4 rounded-md border">
           <h3 className="text-lg font-medium mb-4">Generierter Text</h3>
@@ -509,4 +498,6 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
       </CardContent>
     </Card>
   );
+
 }
+
