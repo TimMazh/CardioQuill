@@ -62,7 +62,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       ? "normal gross, konzentrisch nicht hypertrophiert"
       : lvText;
     let lvSysTextOut = lvSysNormal === "yes"
-      ? "Normalle linksventrikuläre systolische Funktion ohne regionnale Wandbewegungsstörungen"
+      ? "Normalle linksventrikuläre systolische Funktion ohne regionale Wandbewegungsstörungen"
       : lvSysText;
     let rvTextOut = rvNormal === "yes"
       ? "normal gross, konzentrisch nicht hypertrophiert"
@@ -129,43 +129,47 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
               </div>
               </RadioGroup>
               {lvNormal === "no" && (
-                <Textarea value={lvText} onChange={e => setLvText(e.target.value)} placeholder="Beschreibung..." />
+                <Textarea value={lvText} onChange={e => setLvText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
               )}
             </div>
             
             <div className="flex flex-col md:flex-row gap-4 mb-2">
               <div className="flex-1 space-y-2">
-                <Label htmlFor="ivsd">IVSd (mm):</Label>
+                <Label htmlFor="ivsd">IVSd</Label>
                 <Input 
                   id="ivsd" 
                   value={ivsd} 
                   onChange={(e) => setIVSd(e.target.value)}
+                  placeholder="mm"
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <Label htmlFor="lvedd">LVEDd (mm):</Label>
+                <Label htmlFor="lvedd">LVEDd</Label>
                 <Input 
                   id="lvedd" 
                   value={lvedd} 
                   onChange={(e) => setLVEDd(e.target.value)}
+                  placeholder="mm"
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <Label htmlFor="lvpwd">LVPWd (mm):</Label>
+                <Label htmlFor="lvpwd">LVPWd</Label>
                 <Input 
                   id="lvpwd" 
                   value={lvpwd} 
                   onChange={(e) => setLVPWd(e.target.value)}
+                  placeholder="mm"
                 />
               </div>
             </div>
             <div className="flex flex-col md:flex-row gap-4 mb-2">
               <div className="flex-1 space-y-2">
-                <Label htmlFor="lvMassIndex">LV-Massenindex (g/m2):</Label>
+                <Label htmlFor="lvMassIndex">LV-Massenindex</Label>
                 <Input 
                   id="lvMassIndex" 
                   value={lvMassIndex} 
                   onChange={(e) => setLVMassIndex(e.target.value)}
+                  placeholder="g/m²"
                 />
               </div>
               <div className="flex-1 space-y-2">
@@ -190,17 +194,17 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
               </div>
             </RadioGroup>
             {lvSysNormal === "no" && (
-              <Textarea value={lvSysText} onChange={e => setLvSysText(e.target.value)} placeholder="Beschreibung..." />
+              <Textarea value={lvSysText} onChange={e => setLvSysText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
             )}
             </div>
             <div className="flex flex-col md:flex-row gap-4 mt-4">
               <div className="flex-1 space-y-2">
-                <Label htmlFor="lvef">LVEF (%):</Label>
-                <Input id="lvef" value={lvef} onChange={e => setLVEF(e.target.value)} />
+                <Label htmlFor="lvef">LVEF</Label>
+                <Input id="lvef" value={lvef} onChange={e => setLVEF(e.target.value)} placeholder="%" />
               </div>
               <div className="flex-1 space-y-2">
-                <Label htmlFor="glStrain">GL Strain (%):</Label>
-                <Input id="glStrain" value={glStrain} onChange={e => setGLStrain(e.target.value)} />
+                <Label htmlFor="glStrain">GL Strain</Label>
+                <Input id="glStrain" value={glStrain} onChange={e => setGLStrain(e.target.value)} placeholder="%" />
               </div>
             </div>
           </div>
@@ -220,11 +224,11 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
               </div>
             </RadioGroup>
             {rvNormal === "no" && (
-              <Textarea value={rvText} onChange={e => setRvText(e.target.value)} placeholder="Beschreibung..." />
+              <Textarea value={rvText} onChange={e => setRvText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
             )}
             <div className="flex-1 space-y-2">
-                <Label htmlFor="rvBasal">RV basal (mm):</Label>
-                <Input id="rvBasal" value={rvBasal} onChange={e => setRVBasal(e.target.value)} />
+                <Label htmlFor="rvBasal">RV basal</Label>
+                <Input id="rvBasal" value={rvBasal} onChange={e => setRVBasal(e.target.value)} placeholder="mm" />
               </div>
             </div>
             <div className="space-y-2 mb-2">
@@ -240,13 +244,13 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
               </div>
             </RadioGroup>
             {rvSysNormal === "no" && (
-              <Textarea value={rvSysText} onChange={e => setRvSysText(e.target.value)} placeholder="Beschreibung..." />
+              <Textarea value={rvSysText} onChange={e => setRvSysText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
             )}
 </div>
             <div className="flex flex-col md:flex-row gap-4 mt-4">
               <div className="flex-1 space-y-2">
-                <Label htmlFor="tapse">TAPSE (mm):</Label>
-                <Input id="tapse" value={tapse} onChange={e => setTAPSE(e.target.value)} />
+                <Label htmlFor="tapse">TAPSE</Label>
+                <Input id="tapse" value={tapse} onChange={e => setTAPSE(e.target.value)} placeholder="mm" />
               </div>
             </div>
           </div>
@@ -258,42 +262,45 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             <h3 className="text-lg font-medium mb-4">Aorta</h3>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 space-y-2">
-                <Label htmlFor="aortenanulus">Anulus (mm):</Label>
+                <Label htmlFor="aortenanulus">Anulus</Label>
                 <Input 
                   id="aortenanulus" 
                   value={aortenanulus} 
                   onChange={(e) => setAortenanulus(e.target.value)}
+                  placeholder="mm"
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <Label htmlFor="aortensinus">Sinus (mm):</Label>  
+                <Label htmlFor="aortensinus">Sinus</Label>  
                 <Input 
                   id="aortensinus" 
                   value={aortensinus} 
                   onChange={(e) => setAortensinus(e.target.value)}
+                  placeholder="mm"
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <Label htmlFor="aortaAsc">Asc. (mm):</Label>
+                <Label htmlFor="aortaAsc">Ascendens</Label>
                 <Input 
                   id="aortaAsc" 
                   value={aortaAsc} 
                   onChange={(e) => setAortaAsc(e.target.value)}
+                  placeholder="mm"
                 />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4 mt-6">
               <div className="flex flex-col space-y-1">
-                <Label htmlFor="vmax">Vmax (m/s):</Label>
-                <Input id="vmax" value={vmax} onChange={e => setVmax(e.target.value)} />
+                <Label htmlFor="vmax">Vmax</Label>
+                <Input id="vmax" value={vmax} onChange={e => setVmax(e.target.value)} placeholder="m/s" />
               </div>
               <div className="flex flex-col space-y-1">
-                <Label htmlFor="dpmax">DP max (mmHg):</Label>
-                <Input id="dpmax" value={dpMax} onChange={e => setDPMax(e.target.value)} />
+                <Label htmlFor="dpmax">DP max</Label>
+                <Input id="dpmax" value={dpMax} onChange={e => setDPMax(e.target.value)} placeholder="mmHg" />
               </div>
               <div className="flex flex-col space-y-1">
-                <Label htmlFor="dpmean">DP mean (mmHg):</Label>
-                <Input id="dpmean" value={dpMean} onChange={e => setDPMean(e.target.value)} />
+                <Label htmlFor="dpmean">DP mean</Label>
+                <Input id="dpmean" value={dpMean} onChange={e => setDPMean(e.target.value)} placeholder="mmHg" />
               </div>
             </div>
           </div>
@@ -313,16 +320,16 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                 </div>
               </RadioGroup>
               {atriaNormal === "no" && (
-                <Textarea value={atriaText} onChange={e => setAtriaText(e.target.value)} placeholder="Beschreibung..." />
+                <Textarea value={atriaText} onChange={e => setAtriaText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
               )}
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="lavi">LAVI (ml/m²):</Label>
-                  <Input id="lavi" value={lavi} onChange={e => setLAVI(e.target.value)} />
+                  <Label htmlFor="lavi">LAVI</Label>
+                  <Input id="lavi" value={lavi} onChange={e => setLAVI(e.target.value)} placeholder="ml/m²" />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <Label htmlFor="ravi">RAVI (ml/m²):</Label>
-                  <Input id="ravi" value={ravi} onChange={e => setRAVI(e.target.value)} />
+                  <Label htmlFor="ravi">RAVI</Label>
+                   <Input id="ravi" value={ravi} onChange={e => setRAVI(e.target.value)} placeholder="ml/m²" />
                 </div>
               </div>
             </div>
@@ -343,7 +350,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                 </div>
               </RadioGroup>
               {relaxationDisorder === "yes" && (
-                <Textarea value={relaxationText} onChange={e => setRelaxationText(e.target.value)} placeholder="Beschreibung..." />
+                <Textarea value={relaxationText} onChange={e => setRelaxationText(e.target.value)} placeholder="Beschreibung der Relaxationsstörung..." />
               )}
               <div className="flex-1 space-y-2">
                   <Label htmlFor="ee">E/E':</Label>
@@ -440,7 +447,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                 </div>
               </RadioGroup>
               {pulmPressure === "yes" && (
-                <Textarea value={pulmPressureText} onChange={e => setPulmPressureText(e.target.value)} placeholder="Beschreibung..." />
+                <Textarea value={pulmPressureText} onChange={e => setPulmPressureText(e.target.value)} placeholder="Beschreibung der pulmonalen Drücke..." />
               )}
             </div>
           </div>
@@ -462,7 +469,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                   </div>
                 </RadioGroup>
                 {pericardEffusion === "yes" && (
-                  <Textarea value={pericardEffusionText} onChange={e => setPericardEffusionText(e.target.value)} placeholder="Beschreibung..." />
+                  <Textarea value={pericardEffusionText} onChange={e => setPericardEffusionText(e.target.value)} placeholder="Beschreibung des Perikardergusses..." />
                 )}
               </div>
               </div>
@@ -479,7 +486,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                   </div>
                 </RadioGroup>
                 {pleuralEffusion === "yes" && (
-                  <Textarea value={pleuralEffusionText} onChange={e => setPleuralEffusionText(e.target.value)} placeholder="Beschreibung..." />
+                  <Textarea value={pleuralEffusionText} onChange={e => setPleuralEffusionText(e.target.value)} placeholder="Beschreibung der Pleuraergüsse..." />
                 )}
               </div>
             </div>
