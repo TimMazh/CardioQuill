@@ -37,7 +37,7 @@ try:
     print("Modellverteilung:")
     print(model.hf_device_map)
 
-    # 5. Generierung mit reduzierter Batch-Größe
+    # 5. Generierung mit reduzierter Batch-Grösse
     prompt = 'Erzähle mir etwas über die Stadt Campo Grande.'
     inputs = tokenizer(prompt, return_tensors="pt").to("cuda")
     

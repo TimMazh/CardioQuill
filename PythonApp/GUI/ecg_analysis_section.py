@@ -74,7 +74,7 @@ class ECGAnalysisSection:
             checkbox.grid(row=i // 4, column=i % 4, padx=5, pady=5, sticky=tk.W)
             self.q_wave_leads_vars[lead] = var
 
-        # Standardmäßig den Frame ausblenden
+        # Standardmässig den Frame ausblenden
         self.q_wave_leads_frame.grid_remove()
 
         # ST-Veränderungen
@@ -92,7 +92,7 @@ class ECGAnalysisSection:
         self.st_changes_text_entry = ttk.Entry(st_frame, textvariable=self.st_changes_text_var)
         self.st_changes_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
-        # Standardmäßig das Texteingabefeld ausblenden
+        # Standardmässig das Texteingabefeld ausblenden
         self.st_changes_text_entry.grid_remove()
 
         # Regelrechte R-Progression
@@ -111,7 +111,7 @@ class ECGAnalysisSection:
         self.r_progression_text_entry = ttk.Entry(r_progression_frame, textvariable=self.r_progression_text_var)
         self.r_progression_text_entry.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
 
-        # Standardmäßig das Texteingabefeld ausblenden
+        # Standardmässig das Texteingabefeld ausblenden
         self.r_progression_text_entry.grid_remove()
 
         # Rhythmusstreifen
@@ -136,13 +136,13 @@ class ECGAnalysisSection:
         ttk.Radiobutton(extrasystole_frame, text="Ja", variable=self.extrasystole_var, value="Ja", command=self.update_extrasystole).grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
         ttk.Radiobutton(extrasystole_frame, text="Nein", variable=self.extrasystole_var, value="Nein", command=self.update_extrasystole).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
 
-        # Abfrage: Vereinzelt oder Regelmäßig
+        # Abfrage: Vereinzelt oder Regelmässig
         self.extrasystole_frequency_var = tk.StringVar(value="Vereinzelt")
         self.extrasystole_frequency_frame = ttk.Frame(extrasystole_frame)
         self.extrasystole_frequency_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky=tk.W)
         ttk.Label(self.extrasystole_frequency_frame, text="Häufigkeit:").grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
         ttk.Radiobutton(self.extrasystole_frequency_frame, text="Vereinzelt", variable=self.extrasystole_frequency_var, value="Vereinzelt", command=self.update_extrasystole).grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
-        ttk.Radiobutton(self.extrasystole_frequency_frame, text="Regelmäßig", variable=self.extrasystole_frequency_var, value="Regelmäßig", command=self.update_extrasystole).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
+        ttk.Radiobutton(self.extrasystole_frequency_frame, text="Regelmässig", variable=self.extrasystole_frequency_var, value="Regelmässig", command=self.update_extrasystole).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
 
         # Checkboxen: Supra- und/oder Ventrikulär
         self.extrasystole_type_vars = {
@@ -155,7 +155,7 @@ class ECGAnalysisSection:
         ttk.Checkbutton(self.extrasystole_type_frame, text="supraventrikulär", variable=self.extrasystole_type_vars["supraventrikulär"], command=self.update_extrasystole).grid(row=0, column=1, padx=5, pady=5, sticky=tk.W)
         ttk.Checkbutton(self.extrasystole_type_frame, text="ventrikulär", variable=self.extrasystole_type_vars["ventrikulär"], command=self.update_extrasystole).grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
 
-        # Deaktiviere die zusätzlichen Optionen standardmäßig
+        # Deaktiviere die zusätzlichen Optionen standardmässig
         self.extrasystole_frequency_frame.grid_remove()
         self.extrasystole_type_frame.grid_remove()
 

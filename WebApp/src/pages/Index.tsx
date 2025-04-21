@@ -157,7 +157,7 @@ const Index = () => {
             <TabsTrigger value="diagnosis">Diagnose</TabsTrigger>
             <TabsTrigger value="risk-factors">Kardiovaskuläre Risikofaktoren</TabsTrigger>
             <TabsTrigger value="secondary-diagnosis">Nebendiagnosen</TabsTrigger>
-            <TabsTrigger value="recommended-procedure">Empfohlene Maßnahmen</TabsTrigger>
+            <TabsTrigger value="recommended-procedure">Empfohlene Massnahmen</TabsTrigger>
             <TabsTrigger value="anamnesis">Anamnese</TabsTrigger>
             <TabsTrigger value="previous-medication">Vormedikation</TabsTrigger>
             <TabsTrigger value="physical-examination">Körperliche Untersuchung</TabsTrigger>
@@ -213,11 +213,11 @@ const Index = () => {
             
             <TabsContent value="recommended-procedure">
               <TextSection 
-                title="Empfohlene Maßnahmen" 
+                title="Empfohlene Massnahmen" 
                 field="recommendedProcedure" 
                 doctorsLetter={doctorsLetter} 
                 updateDoctorsLetter={updateDoctorsLetter} 
-                placeholder="Empfohlene Maßnahmen beschreiben..." 
+                placeholder="Empfohlene Massnahmen beschreiben..." 
               />
             </TabsContent>
             
