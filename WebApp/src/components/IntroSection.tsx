@@ -12,7 +12,8 @@ interface IntroSectionProps {
 }
 
 export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectionProps) {
-  const [greeting, setGreeting] = useState<"Liebe" | "Sehr geehrte">("Sehr geehrte");
+  const [greeting, setGreeting] = useState(doctorsLetter.greeting || "Sehr geehrte");
+  
 
   // Update intro text when greeting changes or relevant patient/doctor data changes
   useEffect(() => {
@@ -69,7 +70,7 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
       `Gerne berichte ich über die kardiologische Verlaufskontrolle ${commonPatient} ` +
       `${patientPronoun} ${patientLastName}, ${patientArticle} sich am ${patientControlDate} in meiner Praxis vorgestellt hatte.\n`;
 
-    updateDoctorsLetter({ introText });
+    updateDoctorsLetter({ introText, greeting });
   };
 
   const handleGreetingChange = (value: "Liebe" | "Sehr geehrte") => {
