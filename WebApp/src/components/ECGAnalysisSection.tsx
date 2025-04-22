@@ -22,23 +22,23 @@ interface ECGAnalysisSectionProps {
 
 export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAnalysisSectionProps) {
   // ECG Analysis state
-  const [sinusRate, setSinusRate] = useState("");
-  const [lagetyp, setLagetyp] = useState("Indifferenztyp");
-  const [pq, setPQ] = useState("");
-  const [qrs, setQRS] = useState("");
-  const [qtc, setQTC] = useState("");
-  const [pathologicalQ, setPathologicalQ] = useState("no");
-  const [qWaveLeads, setQWaveLeads] = useState<string[]>([]);
-  const [stChanges, setSTChanges] = useState("no");
-  const [stChangesText, setSTChangesText] = useState("");
-  const [rProgression, setRProgression] = useState("yes");
-  const [rProgressionText, setRProgressionText] = useState("");
-  const [rhythmContinuity, setRhythmContinuity] = useState("durchgehend");
-  const [rhythmContinuityText, setRhythmContinuityText] = useState("");
-  const [rhythmFrequency, setRhythmFrequency] = useState("normofrequent");
-  const [extrasystole, setExtrasystole] = useState("no");
-  const [extrasystoleFrequency, setExtrasystoleFrequency] = useState("vereinzelt");
-  const [extrasystoleTypes, setExtrasystoleTypes] = useState<string[]>([]);
+  const [sinusRate, setSinusRate] = useState(doctorsLetter.sinusRate || "");
+  const [lagetyp, setLagetyp] = useState(doctorsLetter.lagetyp || "Indifferenztyp");
+  const [pq, setPQ] = useState(doctorsLetter.pq || "");
+  const [qrs, setQRS] = useState(doctorsLetter.qrs || "");
+  const [qtc, setQTC] = useState(doctorsLetter.qtc || "");
+  const [hasPathologicalQ, setHasPathologicalQ] = useState(doctorsLetter.hasPathologicalQ || false);
+  const [qWaveLeads, setQWaveLeads] = useState<string[]>(doctorsLetter.qWaveLeads || []);
+  const [hasSTChanges, setHasSTChanges] = useState(doctorsLetter.hasSTChanges || false);
+  const [stChangesText, setSTChangesText] = useState(doctorsLetter.stChangesText || "");
+  const [hasRProgression, setHasRProgression] = useState(doctorsLetter.hasRProgression || false);
+  const [rProgressionText, setRProgressionText] = useState(doctorsLetter.rProgressionText || "");
+  const [rhythmContinuity, setRhythmContinuity] = useState(doctorsLetter.rhythmContinuity || "durchgehend");  
+  const [rhythmContinuityText, setRhythmContinuityText] = useState(doctorsLetter.rhythmContinuityText || "");
+  const [rhythmFrequency, setRhythmFrequency] = useState(doctorsLetter.rhythmFrequency || "normofrequent");  
+  const [extrasystole, setExtrasystole] = useState(doctorsLetter.extrasystole || "no");
+  const [extrasystoleFrequency, setExtrasystoleFrequency] = useState(doctorsLetter.extrasystoleFrequency || "vereinzelt");
+  const [extrasystoleTypes, setExtrasystoleTypes] = useState<string[]>(doctorsLetter.extrasystoleTypes || []);
   
   // Output text
   const [outputText, setOutputText] = useState("");
@@ -47,8 +47,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
   useEffect(() => {
     updateECGAnalysisText();
   }, [
-    sinusRate, lagetyp, pq, qrs, qtc, pathologicalQ, qWaveLeads, 
-    stChanges, stChangesText, rProgression, rProgressionText,
+    sinusRate, lagetyp, pq, qrs, qtc, hasPathologicalQ, qWaveLeads, 
+    hasSTChanges, stChangesText, hasRProgression, rProgressionText,
     rhythmContinuity, rhythmFrequency, extrasystole, 
     extrasystoleFrequency, extrasystoleTypes, rhythmContinuityText
   ]);
@@ -99,7 +99,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
 
     // Pathologisches Q
     let qWaveText = "";
-    if (pathologicalQ === "yes" && qWaveLeads.length > 0) {
+    if (hasPathologicalQ && qWaveLeads.length > 0) {
 
       const sortedLeads = qWaveLeads.sort((a, b) => {
         const leadOrder = ["I", "II", "III", "aVF", "aVR", "aVL", "V1", "V2", "V3", "V4", "V5", "V6"];
@@ -113,7 +113,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
 
     // ST-Veränderungen
     let stText = "";
-    if (stChanges === "yes" && stChangesText) {
+    if (hasSTChanges && stChangesText) {
       stText = `${stChangesText}.`;
     } else {
       stText = "Keine spezifischen ST-Veränderungen.";
@@ -121,10 +121,10 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
 
     // Regelrechte R-Progression
     let rProgressionText2 = "";
-    if (rProgression === "yes") {
-      rProgressionText2 = "Regelrechte R-Progression.";
-    } else if (rProgressionText) {
+    if (hasRProgression && rProgressionText) {
       rProgressionText2 = `${rProgressionText}.`;
+    } else {
+      rProgressionText2 = "Keine spezifische R-Progression.";
     }
 
     // Rhythmusstreifen
@@ -153,7 +153,25 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     ].filter(Boolean).join(" ");
     
     setOutputText(ecgAnalysisText);
-    updateDoctorsLetter({ ecgAnalysis: ecgAnalysisText });
+    updateDoctorsLetter({ 
+      sinusRate,
+      lagetyp,
+      pq,
+      qrs,
+      qtc,
+      hasPathologicalQ,
+      qWaveLeads,
+      hasSTChanges,
+      stChangesText,
+      hasRProgression,
+      rProgressionText,
+      rhythmContinuity,
+      rhythmContinuityText,
+      rhythmFrequency,
+      extrasystole,
+      extrasystoleFrequency,
+      extrasystoleTypes
+    });
   };
 
   return (
@@ -240,8 +258,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             <div className="space-y-2">
               <Label>Pathologisches Q?</Label>
               <RadioGroup 
-                value={pathologicalQ} 
-                onValueChange={setPathologicalQ}
+                value={hasPathologicalQ ? "yes" : "no"} 
+                onValueChange={(value) => setHasPathologicalQ(value === "yes")}
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -254,7 +272,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 </div>
               </RadioGroup>
             </div>
-            {pathologicalQ === "yes" && (
+            {hasPathologicalQ && (
               <div className="flex flex-row gap-4">
                 {/* Gruppe 1: I, II, III */}
                 <div className="flex flex-col space-y-2">
@@ -319,8 +337,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             <div className="space-y-2">
               <Label>ST-Veränderungen?</Label>
               <RadioGroup 
-                value={stChanges} 
-                onValueChange={setSTChanges}
+                value={hasSTChanges ? "yes" : "no"} 
+                onValueChange={(value) => setHasSTChanges(value === "yes")}
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -333,7 +351,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 </div>
               </RadioGroup>
             </div>
-            {stChanges === "yes" && (
+            {hasSTChanges && (
               <Textarea 
                 className="min-h-[40px]"
                 value={stChangesText}
@@ -350,8 +368,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             <div className="space-y-2">
               <Label>Regelrechte R-Progression?</Label>
               <RadioGroup 
-                value={rProgression} 
-                onValueChange={setRProgression}
+                value={hasRProgression ? "yes" : "no"} 
+                onValueChange={(value) => setHasRProgression(value === "yes")}
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -364,7 +382,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 </div>
               </RadioGroup>
             </div>
-            {rProgression === "no" && (
+            {hasRProgression && (
               <Textarea 
                 className="min-h-[40px]"
                 value={rProgressionText}
