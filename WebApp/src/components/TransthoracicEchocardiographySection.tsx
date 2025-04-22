@@ -13,74 +13,131 @@ interface TransthoracicEchocardiographySectionProps {
 
 export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoctorsLetter }: TransthoracicEchocardiographySectionProps) {
   // State for all fields
-  const [lvNormal, setLvNormal] = useState("yes");
-  const [lvText, setLvText] = useState("");
-  const [ivsd, setIVSd] = useState("");
-  const [lvedd, setLVEDd] = useState("");
-  const [lvpwd, setLVPWd] = useState("");
-  const [lvMassIndex, setLVMassIndex] = useState("");
-  const [rwt, setRWT] = useState("");
-  const [lvSysNormal, setLvSysNormal] = useState("yes");
-  const [lvSysText, setLvSysText] = useState("");
-  const [lvef, setLVEF] = useState("");
-  const [glStrain, setGLStrain] = useState("");
-  const [aortenanulus, setAortenanulus] = useState("");
-  const [aortensinus, setAortensinus] = useState("");
-  const [aortaAsc, setAortaAsc] = useState("");
-  const [rvNormal, setRvNormal] = useState("yes");
-  const [rvText, setRvText] = useState("");
-  const [rvBasal, setRVBasal] = useState("");
-  const [rvSysNormal, setRvSysNormal] = useState("yes");
-  const [rvSysText, setRvSysText] = useState("");
-  const [tapse, setTAPSE] = useState("");
-  const [atriaNormal, setAtriaNormal] = useState("yes");
-  const [atriaText, setAtriaText] = useState("");
-  const [lavi, setLAVI] = useState("");
-  const [ravi, setRAVI] = useState("");
-  const [relaxationDisorder, setRelaxationDisorder] = useState("no");
-  const [relaxationText, setRelaxationText] = useState("");
-  const [ee, setEE] = useState("");
-  const [valvePathology, setValvePathology] = useState("no");
-  const [mitralValve, setMitralValve] = useState("");
-  const [tricuspidValve, setTricuspidValve] = useState("");
-  const [pulmonalValve, setPulmonalValve] = useState("");
-  const [aorticValve, setAorticValve] = useState("");
-  const [pulmPressure, setPulmPressure] = useState("no");
-  const [pulmPressureText, setPulmPressureText] = useState("");
-  const [pericardEffusion, setPericardEffusion] = useState("no");
-  const [pericardEffusionText, setPericardEffusionText] = useState("");
-  const [pleuralEffusion, setPleuralEffusion] = useState("no");
-  const [pleuralEffusionText, setPleuralEffusionText] = useState("");
-  const [vmax, setVmax] = useState("");
-  const [dpMax, setDPMax] = useState("");
-  const [dpMean, setDPMean] = useState("");
+  const [isLvNormal, setIsLvNormal] = useState(
+    typeof doctorsLetter.isLvNormal === "boolean" ? doctorsLetter.isLvNormal : true
+  );
+  const [lvText, setLvText] = useState(doctorsLetter.lvText || "");
+  const [ivsd, setIVSd] = useState(doctorsLetter.ivsd || "");
+  const [lvedd, setLVEDd] = useState(doctorsLetter.lvedd || "");
+  const [lvpwd, setLVPWd] = useState(doctorsLetter.lvpwd || "");  
+  const [lvMassIndex, setLVMassIndex] = useState(doctorsLetter.lvMassIndex || "");
+  const [rwt, setRWT] = useState(doctorsLetter.rwt || "");
+  const [isLvSysNormal, setIsLvSysNormal] = useState(
+    typeof doctorsLetter.isLvSysNormal === "boolean" ? doctorsLetter.isLvSysNormal : true
+  );
+  const [lvSysText, setLvSysText] = useState(doctorsLetter.lvSysText || "");
+  const [lvef, setLVEF] = useState(doctorsLetter.lvef || "");
+  const [glStrain, setGLStrain] = useState(doctorsLetter.glStrain || "");
+  const [isRvNormal, setIsRvNormal] = useState(
+    typeof doctorsLetter.isRvNormal === "boolean" ? doctorsLetter.isRvNormal : true
+  );
+  const [rvText, setRvText] = useState(doctorsLetter.rvText || "");
+  const [rvBasal, setRVBasal] = useState(doctorsLetter.rvBasal || "");
+  const [isRvSysNormal, setIsRvSysNormal] = useState(
+    typeof doctorsLetter.isRvSysNormal === "boolean" ? doctorsLetter.isRvSysNormal : true
+  );
+  const [rvSysText, setRvSysText] = useState(doctorsLetter.rvSysText || "");
+  const [tapse, setTAPSE] = useState(doctorsLetter.tapse || "");
+  const [aortenanulus, setAortenanulus] = useState(doctorsLetter.aortenanulus || "");
+  const [aortensinus, setAortensinus] = useState(doctorsLetter.aortensinus || "");
+  const [aortaAsc, setAortaAsc] = useState(doctorsLetter.aortaAsc || "");
+  const [vmax, setVmax] = useState(doctorsLetter.vmax || "");
+  const [dpMax, setDPMax] = useState(doctorsLetter.dpMax || "");
+  const [dpMean, setDPMean] = useState(doctorsLetter.dpMean || "");
+  const [isAtriaNormal, setIsAtriaNormal] = useState(
+    typeof doctorsLetter.isAtriaNormal === "boolean" ? doctorsLetter.isAtriaNormal : true
+  );
+  const [atriaText, setAtriaText] = useState(doctorsLetter.atriaText || "");
+  const [lavi, setLAVI] = useState(doctorsLetter.lavi || "");
+  const [ravi, setRAVI] = useState(doctorsLetter.ravi || "");
+  const [hasRelaxationDisorder, setHasRelaxationDisorder] = useState(doctorsLetter.hasRelaxationDisorder || false);
+  const [relaxationText, setRelaxationText] = useState(doctorsLetter.relaxationText || "");
+  const [ee, setEE] = useState(doctorsLetter.ee || "");
+  const [hasValvePathology, setHasValvePathology] = useState(doctorsLetter.hasValvePathology || false);
+  const [mitralValve, setMitralValve] = useState(doctorsLetter.mitralValve || "");
+  const [tricuspidValve, setTricuspidValve] = useState(doctorsLetter.tricuspidValve || "");
+  const [pulmonalValve, setPulmonalValve] = useState(doctorsLetter.pulmonalValve || "");
+  const [aorticValve, setAorticValve] = useState(doctorsLetter.aorticValve || "");
+  const [hasPulmPressure, setHasPulmPressure] = useState(doctorsLetter.hasPulmPressure || false);
+  const [pulmPressureText, setPulmPressureText] = useState(doctorsLetter.pulmPressureText || "");
+  const [hasPericardEffusion, setHasPericardEffusion] = useState(doctorsLetter.hasPericardEffusion || false);
+  const [pericardEffusionText, setPericardEffusionText] = useState(doctorsLetter.pericardEffusionText || "");
+  const [hasPleuralEffusion, setHasPleuralEffusion] = useState(doctorsLetter.hasPleuralEffusion || false);
+  const [pleuralEffusionText, setPleuralEffusionText] = useState(doctorsLetter.pleuralEffusionText || "");
+
 
   const [outputText, setOutputText] = useState("");
 
   useEffect(() => {
-    let lvTextOut = lvNormal === "yes"
+    updateECGAnalysisText();
+  }, [
+    isLvNormal,
+    lvText,
+    ivsd,
+    lvedd,
+    lvpwd,
+    lvMassIndex,
+    rwt,
+    isLvSysNormal,
+    lvSysText,
+    lvef,
+    glStrain,
+    isRvNormal,
+    rvText,
+    rvBasal,
+    isRvSysNormal,
+    rvSysText,
+    tapse,
+    aortenanulus,
+    aortensinus,
+    aortaAsc,
+    vmax,
+    dpMax,
+    dpMean,
+    isAtriaNormal,
+    atriaText,
+    lavi,
+    ravi,
+    hasRelaxationDisorder,
+    relaxationText,
+    ee,
+    hasValvePathology,
+    mitralValve,
+    tricuspidValve,
+    pulmonalValve,
+    aorticValve,
+    hasPulmPressure,
+    pulmPressureText,
+    hasPericardEffusion,
+    pericardEffusionText,
+    hasPleuralEffusion,
+    pleuralEffusionText
+  ]);
+
+  const updateECGAnalysisText = () => {
+    let lvTextOut = isLvNormal
       ? "normal gross, konzentrisch nicht hypertrophiert"
       : lvText;
-    let lvSysTextOut = lvSysNormal === "yes"
+    let lvSysTextOut = isLvSysNormal
       ? "Normalle linksventrikuläre systolische Funktion ohne regionale Wandbewegungsstörungen"
       : lvSysText;
-    let rvTextOut = rvNormal === "yes"
+    let rvTextOut = isRvNormal
       ? "normal gross, konzentrisch nicht hypertrophiert"
       : rvText;
-    let rvSysTextOut = rvSysNormal === "yes"
+    let rvSysTextOut = isRvSysNormal
       ? "Normale rechtsventrikuläre systolische Funktion"
       : rvSysText;
-    let atriaTextOut = atriaNormal === "yes"
+    let atriaTextOut = isAtriaNormal
       ? "Beide Vorhöfe normal gross"
       : atriaText;
-    let relaxationTextOut = relaxationDisorder === "yes"
+    let relaxationTextOut = hasRelaxationDisorder
       ? relaxationText
       : "Keine relevante diastolische Dysfunktion (Relaxationsstörung)";
     let mitralValveOut = "";
     let tricuspidValveOut = "";
     let pulmonalValveOut = "";
     let aorticValveOut = "";
-    if (valvePathology === "yes") {
+    if (hasValvePathology) {
       
       mitralValveOut = mitralValve === "" || mitralValve === "Keine" ? "Keine Mitralklappeninsuffizienz oder Stenose." : `Mitralklappen${mitralValve.toLowerCase()}.`;
       tricuspidValveOut = tricuspidValve === "" || tricuspidValve === "Keine" ? "Keine Trikuspidalklappeninsuffizienz oder Stenose." : `Trikuspidalklappe${tricuspidValve.toLowerCase()}.`;
@@ -92,9 +149,9 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       pulmonalValveOut = "Keine Pulmonalklappeninsuffizienz oder Stenose.";
       aorticValveOut = "Keine Aortenklappeninsuffizienz oder Stenose.";
     }
-    let pulmPressureOut = pulmPressure === "yes" ? pulmPressureText : "Kein Hinweis für erhöhte pulmonale Drücke";
-    let pericardEffusionOut = pericardEffusion === "yes" ? pericardEffusionText : "Kein Perikarderguss";
-    let pleuralEffusionOut = pleuralEffusion === "yes" ? pleuralEffusionText : "Keine Pleuraergüsse";
+    let pulmPressureOut = hasPulmPressure ? pulmPressureText : "Kein Hinweis für erhöhte pulmonale Drücke";
+    let pericardEffusionOut = hasPericardEffusion ? pericardEffusionText : "Kein Perikarderguss";
+    let pleuralEffusionOut = hasPleuralEffusion ? pleuralEffusionText : "Keine Pleuraergüsse";
     let text =
       `Linker Ventrikel ${lvTextOut}. IVSd ${ivsd} mm, LVEDd ${lvedd} mm, LVPWd ${lvpwd} mm, LV-Massenindex ${lvMassIndex} g/m2, RWT ${rwt}. ` +
       `${lvSysTextOut}. LVEF ${lvef}%. GL Strain ${glStrain}%. Aortenanulus ${aortenanulus} mm, Aortensinus ${aortensinus} mm, Aorta ascendens ${aortaAsc} mm. ` +
@@ -103,9 +160,51 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       `${mitralValveOut} ${tricuspidValveOut} ${pulmonalValveOut} ${aorticValveOut} ` +
       `${pulmPressureOut}. ${pericardEffusionOut}. ${pleuralEffusionOut}. Vmax ${vmax} m/s, DP max ${dpMax} mmHg, DP mean ${dpMean} mmHg.`;
     setOutputText(text);
-    updateDoctorsLetter({ transthoracicEchocardiography: text });
-  }, [lvNormal, lvText, ivsd, lvedd, lvpwd, lvMassIndex, rwt, lvSysNormal, lvSysText, lvef, glStrain, aortenanulus, aortensinus, aortaAsc, rvNormal, rvText, rvBasal, rvSysNormal, rvSysText, tapse, atriaNormal, atriaText, lavi, ravi, relaxationDisorder, relaxationText, ee, valvePathology, mitralValve, tricuspidValve, pulmonalValve, aorticValve, pulmPressure, pulmPressureText, pericardEffusion, pericardEffusionText, pleuralEffusion, pleuralEffusionText, vmax, dpMax, dpMean]);
 
+    updateDoctorsLetter({
+      isLvNormal,
+      lvText,
+      ivsd,
+      lvedd,
+      lvpwd,
+      lvMassIndex,
+      rwt,
+      isLvSysNormal,
+      lvSysText,
+      lvef,
+      glStrain,
+      isRvNormal,
+      rvText,
+      rvBasal,
+      isRvSysNormal,
+      rvSysText,
+      tapse,
+      aortenanulus,
+      aortensinus,
+      aortaAsc,
+      vmax,
+      dpMax,
+      dpMean,
+      isAtriaNormal,
+      atriaText,
+      lavi,
+      ravi,
+      hasRelaxationDisorder,
+      relaxationText,
+      ee,
+      hasValvePathology,
+      mitralValve,
+      tricuspidValve,
+      pulmonalValve,
+      aorticValve,
+      hasPulmPressure,
+      pulmPressureText,
+      hasPericardEffusion,
+      pericardEffusionText,
+      hasPleuralEffusion,
+      pleuralEffusionText
+    })
+  };
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -119,7 +218,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             <h3 className="text-lg font-medium mb-4">Linker Ventrikel</h3>
             <div className="space-y-2 mb-2">
               <Label>Linker Ventrikel normal?</Label>
-              <RadioGroup value={lvNormal} onValueChange={setLvNormal} className="flex space-x-4 mb-2">
+              <RadioGroup value={isLvNormal ? "yes" : "no"} 
+                          onValueChange={(v) => setIsLvNormal(v === "yes")} className="flex space-x-4 mb-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="lv-yes" />
                   <Label htmlFor="lv-yes">Ja</Label>
@@ -129,7 +229,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                 <Label htmlFor="lv-no">Nein</Label>
               </div>
               </RadioGroup>
-              {lvNormal === "no" && (
+              {isLvNormal === false && (
                 <Textarea value={lvText} onChange={e => setLvText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
               )}
             </div>
@@ -184,7 +284,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             </div>
             <div className="space-y-2">
             <Label>Normale linksventrikuläre systolische Funktion?</Label>
-            <RadioGroup value={lvSysNormal} onValueChange={setLvSysNormal} className="flex space-x-4 mb-2">
+            <RadioGroup value={isLvSysNormal ? "yes" : "no"} onValueChange={(v) => setIsLvSysNormal(v === "yes")} className="flex space-x-4 mb-2">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="lv-sys-yes" />
                 <Label htmlFor="lv-sys-yes">Ja</Label>
@@ -194,7 +294,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                 <Label htmlFor="lv-sys-no">Nein</Label>
               </div>
             </RadioGroup>
-            {lvSysNormal === "no" && (
+            {isLvSysNormal === false && (
               <Textarea value={lvSysText} onChange={e => setLvSysText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
             )}
             </div>
@@ -214,7 +314,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             <h3 className="text-lg font-medium mb-4">Rechter Ventrikel</h3>
             <div className="space-y-2 mb-2">
             <Label>Rechter Ventrikel normal?</Label>
-            <RadioGroup value={rvNormal} onValueChange={setRvNormal} className="flex space-x-4 mb-2">
+            <RadioGroup value={isRvNormal ? "yes" : "no"} onValueChange={(v) => setIsRvNormal(v === "yes")} className="flex space-x-4 mb-2">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="rv-yes" />
                 <Label htmlFor="rv-yes">Ja</Label>
@@ -224,7 +324,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                 <Label htmlFor="rv-no">Nein</Label>
               </div>
             </RadioGroup>
-            {rvNormal === "no" && (
+            {isRvNormal === false && (
               <Textarea value={rvText} onChange={e => setRvText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
             )}
             <div className="flex-1 space-y-2">
@@ -234,7 +334,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             </div>
             <div className="space-y-2 mb-2">
             <Label className="mt-4">Normale rechtsventrikuläre systolische Funktion?</Label>
-            <RadioGroup value={rvSysNormal} onValueChange={setRvSysNormal} className="flex space-x-4 mb-2">
+            <RadioGroup value={isRvSysNormal ? "yes" : "no"} onValueChange={(v) => setIsRvSysNormal(v === "yes")} className="flex space-x-4 mb-2">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="rv-sys-yes" />
                 <Label htmlFor="rv-sys-yes">Ja</Label>
@@ -244,7 +344,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                 <Label htmlFor="rv-sys-no">Nein</Label>
               </div>
             </RadioGroup>
-            {rvSysNormal === "no" && (
+            {isRvSysNormal === false && (
               <Textarea value={rvSysText} onChange={e => setRvSysText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
             )}
 </div>
@@ -310,7 +410,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             <h3 className="text-lg font-medium mb-4">Vorhöfe</h3>
             <div className="space-y-2 mb-2">
               <Label>Vorhöfe normal gross?</Label>
-              <RadioGroup value={atriaNormal} onValueChange={setAtriaNormal} className="flex space-x-4 mb-2">
+              <RadioGroup value={isAtriaNormal ? "yes" : "no"} 
+                          onValueChange={(v) => setIsAtriaNormal(v === "yes")} className="flex space-x-4 mb-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="atria-yes" />
                   <Label htmlFor="atria-yes">Ja</Label>
@@ -320,7 +421,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                   <Label htmlFor="atria-no">Nein</Label>
                 </div>
               </RadioGroup>
-              {atriaNormal === "no" && (
+              {isAtriaNormal === false && (
                 <Textarea value={atriaText} onChange={e => setAtriaText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
               )}
               <div className="grid grid-cols-2 gap-4 mt-4">
@@ -340,7 +441,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             <h3 className="text-lg font-medium mb-4">Relaxation</h3>
             <div className="space-y-2">
               <Label>Relaxationsstörung?</Label>
-              <RadioGroup value={relaxationDisorder} onValueChange={setRelaxationDisorder} className="flex space-x-4 mb-2">
+              <RadioGroup value={hasRelaxationDisorder ? "yes" : "no"} 
+                          onValueChange={(v) => setHasRelaxationDisorder(v === "yes")} className="flex space-x-4 mb-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="relax-yes" />
                   <Label htmlFor="relax-yes">Ja</Label>
@@ -350,7 +452,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                   <Label htmlFor="relax-no">Nein</Label>
                 </div>
               </RadioGroup>
-              {relaxationDisorder === "yes" && (
+              {hasRelaxationDisorder && (
                 <Textarea value={relaxationText} onChange={e => setRelaxationText(e.target.value)} placeholder="Beschreibung der Relaxationsstörung..." />
               )}
               <div className="flex-1 space-y-2">
@@ -364,7 +466,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             <h3 className="text-lg font-medium mb-4">Herzklappe</h3>
             <div className="space-y-2">
               <Label>Pathologische Herzklappe?</Label>
-              <RadioGroup value={valvePathology} onValueChange={setValvePathology} className="flex space-x-4 mb-2">
+              <RadioGroup value={hasValvePathology ? "yes" : "no"} 
+              onValueChange={(v) => setHasValvePathology(v === "yes")} className="flex space-x-4 mb-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="valve-yes" />
                   <Label htmlFor="valve-yes">Ja</Label>
@@ -374,7 +477,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                   <Label htmlFor="valve-no">Nein</Label>
                 </div>
               </RadioGroup>
-              {valvePathology === "yes" && (
+              {hasValvePathology && (
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div>
                     <Label>Mitralklappe</Label>
@@ -441,7 +544,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
             <h3 className="text-lg font-medium mb-4">Pulmonale Drücke</h3>
             <div className="space-y-2">
               <Label>Erhöhte pulmonale Drücke?</Label>
-              <RadioGroup value={pulmPressure} onValueChange={setPulmPressure} className="flex space-x-4 mb-2">
+              <RadioGroup value={hasPulmPressure ? "yes" : "no"} 
+                      onValueChange={(v) => setHasPulmPressure(v === "yes")} className="flex space-x-4 mb-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="pulm-yes" />
                   <Label htmlFor="pulm-yes">Ja</Label>
@@ -451,7 +555,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                   <Label htmlFor="pulm-no">Nein</Label>
                 </div>
               </RadioGroup>
-              {pulmPressure === "yes" && (
+              {hasPulmPressure && (
                 <Textarea value={pulmPressureText} onChange={e => setPulmPressureText(e.target.value)} placeholder="Beschreibung der pulmonalen Drücke..." />
               )}
             </div>
@@ -463,7 +567,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
               <div>
                 <div className="flex-1 space-y-2">
                 <Label>Perikarderguss?</Label>
-                <RadioGroup value={pericardEffusion} onValueChange={setPericardEffusion} className="flex space-x-4 mb-2">
+                <RadioGroup value={hasPericardEffusion ? "yes" : "no"} 
+                      onValueChange={(v) => setHasPericardEffusion(v === "yes")} className="flex space-x-4 mb-2">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="yes" id="peri-yes" />
                     <Label htmlFor="peri-yes">Ja</Label>
@@ -473,14 +578,15 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                     <Label htmlFor="peri-no">Nein</Label>
                   </div>
                 </RadioGroup>
-                {pericardEffusion === "yes" && (
+                {hasPericardEffusion && (
                   <Textarea value={pericardEffusionText} onChange={e => setPericardEffusionText(e.target.value)} placeholder="Beschreibung des Perikardergusses..." />
                 )}
               </div>
               </div>
                 <div className="flex-1 space-y-2">
                 <Label>Pleuraergüsse?</Label>
-                <RadioGroup value={pleuralEffusion} onValueChange={setPleuralEffusion} className="flex space-x-4 mb-2">
+                <RadioGroup value={hasPleuralEffusion ? "yes" : "no"} 
+                      onValueChange={(v) => setHasPleuralEffusion(v === "yes")} className="flex space-x-4 mb-2">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="yes" id="pleura-yes" />
                     <Label htmlFor="pleura-yes">Ja</Label>
@@ -490,7 +596,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                     <Label htmlFor="pleura-no">Nein</Label>
                   </div>
                 </RadioGroup>
-                {pleuralEffusion === "yes" && (
+                {hasPleuralEffusion && (
                   <Textarea value={pleuralEffusionText} onChange={e => setPleuralEffusionText(e.target.value)} placeholder="Beschreibung der Pleuraergüsse..." />
                 )}
               </div>
