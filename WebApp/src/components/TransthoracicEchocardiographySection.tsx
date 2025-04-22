@@ -119,7 +119,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       ? "normal gross, konzentrisch nicht hypertrophiert"
       : lvText;
     let lvSysTextOut = isLvSysNormal
-      ? "Normalle linksventrikuläre systolische Funktion ohne regionale Wandbewegungsstörungen"
+      ? "Normale linksventrikuläre systolische Funktion ohne regionale Wandbewegungsstörungen"
       : lvSysText;
     let rvTextOut = isRvNormal
       ? "normal gross, konzentrisch nicht hypertrophiert"
