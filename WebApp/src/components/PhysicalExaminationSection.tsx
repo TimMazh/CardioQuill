@@ -27,19 +27,22 @@ export function PhysicalExaminationSection({
   const [bpLeftDia, setBPLeftDia] = useState(doctorsLetter.bpLeftDia || "");
   const [bpRightSys, setBPRightSys] = useState(doctorsLetter.bpRightSys || "");
   const [bpRightDia, setBPRightDia] = useState(doctorsLetter.bpRightDia || "");
-  const [hasBPSideDifference, setHasBPSideDifference] = useState(false);
+  const [hasBPSideDifference, setHasBPSideDifference] = useState(doctorsLetter.hasBPSideDifference || false);
   const [pulse, setPulse] = useState(doctorsLetter.pulse || "");
-  const [heartRhythm, setHeartRhythm] = useState(doctorsLetter.heartRhythm || "rhythmisch");
-  const [heartRhythmDetails, setHeartRhythmDetails] = useState("");
+  const [heartRhythm, setHeartRhythm] = useState(doctorsLetter.heartRhythm || "Cor rhythmisch");
+  const [heartRhythmDetails, setHeartRhythmDetails] = useState(doctorsLetter.heartRhythmDetails || "" );
   const [heartPathology, setHeartPathology] = useState(doctorsLetter.heartPathology || "");
-  const [hasHeartPathology, setHasHeartPathology] = useState(false);
-  const [lungAbnormal, setLungAbnormal] = useState(false);
-  const [lungDetails, setLungDetails] = useState("");
-  const [pulseStatus, setPulseStatus] = useState("normal");
-  const [flowNoise, setFlowNoise] = useState(false);
-  const [flowNoiseDetails, setFlowNoiseDetails] = useState("");
-  const [edema, setEdema] = useState(false);
-  const [edemaDetails, setEdemaDetails] = useState("");
+  const [hasHeartPathology, setHasHeartPathology] = useState(doctorsLetter.hasHeartPathology || false);
+  const [hasLungAbnormality, setHasLungAbnormality] = useState(doctorsLetter.hasLungAbnormality || false);
+  const [lungDetails, setLungDetails] = useState(doctorsLetter.lungDetails || "");
+  const [pulseStatus, setPulseStatus] = useState(doctorsLetter.pulseStatus || "");
+  const [hasGoodPulse, setHasGoodPulse] = useState(
+  typeof doctorsLetter.hasGoodPulse === "boolean" ? doctorsLetter.hasGoodPulse : true
+);
+  const [flowNoiseDetails, setFlowNoiseDetails] = useState(doctorsLetter.flowNoiseDetails || "");
+  const [hasFlowNoise, setHasFlowNoise] = useState(doctorsLetter.hasFlowNoise || false);
+  const [edemaDetails, setEdemaDetails] = useState(doctorsLetter.edemaDetails || "");
+  const [hasEdema, setHasEdema] = useState(doctorsLetter.hasEdema || false);
 
   // Update examination text when any input changes
   useEffect(() => {
@@ -47,8 +50,8 @@ export function PhysicalExaminationSection({
   }, [
     az, ez, height, weight, bmi, bpLeftSys, bpLeftDia, bpRightSys, bpRightDia,
     hasBPSideDifference, pulse, heartRhythm, heartRhythmDetails, hasHeartPathology, heartPathology,
-    lungAbnormal, lungDetails, pulseStatus, flowNoise, flowNoiseDetails,
-    edema, edemaDetails
+    hasLungAbnormality, lungDetails, pulseStatus, flowNoiseDetails,
+    hasEdema, edemaDetails, hasGoodPulse, hasFlowNoise
   ]);
 
   // Generate the examination text
@@ -85,7 +88,7 @@ export function PhysicalExaminationSection({
     }
     
     // Lung
-    if (lungAbnormal) {
+    if (hasLungAbnormality) {
       examinationText += `${lungDetails}. `;
     } else {
       examinationText += `Pulmo mit VAG beidseits, keine Rasselgeräusche. `;
@@ -104,21 +107,21 @@ export function PhysicalExaminationSection({
     }
     
     // Pulses
-    if (pulseStatus === "normal") {
+    if (hasGoodPulse) {
       examinationText += `Pulse allseits gut tastbar. `;
     } else {
       examinationText += `${pulseStatus}. `;
     }
     
     // Flow noises
-    if (flowNoise) {
+    if (hasFlowNoise) {
       examinationText += `${flowNoiseDetails}. `;
     } else {
       examinationText += `Keine Strömungsgeräusche. `;
     }
     
     // Edema
-    if (edema) {
+    if (hasEdema) {
       examinationText += `${edemaDetails}. `;
     } else {
       examinationText += `Keine peripheren Ödeme. Kardinal kompensiert.`;
@@ -136,14 +139,20 @@ export function PhysicalExaminationSection({
       bpLeftDia,
       bpRightSys,
       bpRightDia,
+      hasBPSideDifference,
       pulse,
       heartRhythm,
       heartRhythmDetails,
+      hasLungAbnormality,
+      lungDetails,
+      hasHeartPathology,
       heartPathology,
-      pulseStatus: pulseStatus === "normal" ? "Pulse allseits gut tastbar" : pulseStatus,
-      edema: edema ? edemaDetails : "Keine peripheren Ödeme",
-      flowNoise: flowNoise ? flowNoiseDetails : "Keine Strömungsgeräusche",
-      lungAbnormal: lungAbnormal ? lungDetails : "Pulmo mit VAG beidseits, keine Rasselgeräusche"
+      hasGoodPulse,
+      pulseStatus,
+      hasEdema,
+      edemaDetails,
+      hasFlowNoise,
+      flowNoiseDetails,
     });
   };
 
@@ -270,8 +279,8 @@ export function PhysicalExaminationSection({
             <CardContent className="space-y-4">
               <Label>Auskultation Lunge abnormal?</Label>
               <RadioGroup 
-                value={lungAbnormal ? "yes" : "no"}
-                onValueChange={(v) => setLungAbnormal(v === "yes")}
+                value={hasLungAbnormality ? "yes" : "no"}
+                onValueChange={(v) => setHasLungAbnormality(v === "yes")}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="lung-abnormal-yes" />
@@ -282,7 +291,7 @@ export function PhysicalExaminationSection({
                   <Label htmlFor="lung-abnormal-no">Nein</Label>
                 </div>
               </RadioGroup>
-              {lungAbnormal && (
+              {hasLungAbnormality && (
                 <Textarea 
                   className="min-h-[40px] mt-2"
                   placeholder="Beschreibung der Auffälligkeiten" 
@@ -300,7 +309,7 @@ export function PhysicalExaminationSection({
             <CardContent className="space-y-4">
               <Label>Herzrhythmus:</Label>
               <RadioGroup 
-                value={heartRhythm}
+                value={heartRhythm === "Cor rhythmisch" ? "Cor rhythmisch" : "Arrhythmisch"}
                 onValueChange={setHeartRhythm}
               >
                 <div className="flex items-center space-x-2">
@@ -353,8 +362,8 @@ export function PhysicalExaminationSection({
             <CardContent className="space-y-4">
               <Label>Pulse allseits gut tastbar:</Label>
               <RadioGroup 
-                value={pulseStatus === "normal" ? "yes" : "no"}
-                onValueChange={(v) => setPulseStatus(v === "yes" ? "normal" : "")}
+                value={hasGoodPulse ? "yes" : "no"}
+                onValueChange={(v) => setHasGoodPulse(v === "yes")}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="yes" id="pulse-normal-yes" />
@@ -365,9 +374,9 @@ export function PhysicalExaminationSection({
                   <Label htmlFor="pulse-normal-no">Nein</Label>
                 </div>
               </RadioGroup>
-              {pulseStatus !== "normal" && (
+              {!hasGoodPulse && (
                 <Textarea 
-                className="min-h-[40px] mt-2" 
+                  className="min-h-[40px] mt-2" 
                   placeholder="Beschreibung der Pulse" 
                   value={pulseStatus} 
                   onChange={(e) => setPulseStatus(e.target.value)} 
@@ -376,8 +385,8 @@ export function PhysicalExaminationSection({
               <div className="space-y-4">
                 <Label>Strömungsgeräusche:</Label>
                 <RadioGroup 
-                  value={flowNoise ? "yes" : "no"}
-                  onValueChange={(v) => setFlowNoise(v === "yes")}
+                  value={hasFlowNoise ? "yes" : "no"}
+                  onValueChange={(v) => setHasFlowNoise(v === "yes")}
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="yes" id="flow-noise-yes" />
@@ -388,7 +397,7 @@ export function PhysicalExaminationSection({
                     <Label htmlFor="flow-noise-no">Nein</Label>
                   </div>
                 </RadioGroup>
-                {flowNoise && (
+                {hasFlowNoise && (
                   <Textarea 
                   className="min-h-[40px] mt-2"
                     placeholder="Beschreibung der Strömungsgeräusche" 
@@ -400,8 +409,8 @@ export function PhysicalExaminationSection({
               <div className="space-y-4">
                 <Label>Ödeme:</Label>
                 <RadioGroup 
-                  value={edema ? "yes" : "no"}
-                  onValueChange={(v) => setEdema(v === "yes")}
+                  value={hasEdema ? "yes" : "no"}
+                  onValueChange={(v) => setHasEdema(v === "yes")}
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="yes" id="edema-yes" />
@@ -412,7 +421,7 @@ export function PhysicalExaminationSection({
                     <Label htmlFor="edema-no">Nein</Label>
                   </div>
                 </RadioGroup>
-                {edema && (
+                {hasEdema && (
                   <Textarea 
                   className="min-h-[40px] mt-2"
                     placeholder="Beschreibung der Ödeme" 
