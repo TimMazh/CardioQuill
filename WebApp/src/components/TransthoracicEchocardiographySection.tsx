@@ -58,6 +58,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
   const [tricuspidValve, setTricuspidValve] = useState(doctorsLetter.tricuspidValve || "");
   const [pulmonalValve, setPulmonalValve] = useState(doctorsLetter.pulmonalValve || "");
   const [aorticValve, setAorticValve] = useState(doctorsLetter.aorticValve || "");
+  const [aorticValveType, setAorticValveType] = useState(doctorsLetter.aorticValveType || "Triskupid");
   const [hasPulmPressure, setHasPulmPressure] = useState(doctorsLetter.hasPulmPressure || false);
   const [pulmPressureText, setPulmPressureText] = useState(doctorsLetter.pulmPressureText || "");
   const [hasPericardEffusion, setHasPericardEffusion] = useState(doctorsLetter.hasPericardEffusion || false);
@@ -72,6 +73,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
     updateECGAnalysisText();
   }, [
     isLvNormal,
+    aorticValveType,
     lvText,
     ivsd,
     lvedd,
@@ -142,12 +144,12 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       mitralValveOut = mitralValve === "" || mitralValve === "Keine" ? "Keine Mitralklappeninsuffizienz oder Stenose." : `Mitralklappen${mitralValve.toLowerCase()}.`;
       tricuspidValveOut = tricuspidValve === "" || tricuspidValve === "Keine" ? "Keine Trikuspidalklappeninsuffizienz oder Stenose." : `Trikuspidalklappe${tricuspidValve.toLowerCase()}.`;
       pulmonalValveOut = pulmonalValve === "" || pulmonalValve === "Keine" ? "Keine Pulmonalklappeninsuffizienz oder Stenose." : `Pulmonalklappe${pulmonalValve.toLowerCase()}.`;
-      aorticValveOut = aorticValve === "" || aorticValve === "Keine" ? "Keine Aortenklappeninsuffizienz oder Stenose." : `Aortenklappe${aorticValve.toLowerCase()}.`;
+      aorticValveOut = aorticValve === "" || aorticValve === "Keine" ? `Keine Aortenklappeninsuffizienz oder Stenose bei ${aorticValveType.toLowerCase()} angelegter Klappe.` : `Aortenklappe${aorticValve.toLowerCase()} bei ${aorticValveType.toLowerCase()} angelegter Klappe.`;
     } else {
       mitralValveOut = "Keine Mitralklappeninsuffizienz oder Stenose.";
       tricuspidValveOut = "Keine Trikuspidalklappeninsuffizienz oder Stenose.";
       pulmonalValveOut = "Keine Pulmonalklappeninsuffizienz oder Stenose.";
-      aorticValveOut = "Keine Aortenklappeninsuffizienz oder Stenose.";
+      aorticValveOut = `Keine Aortenklappeninsuffizienz oder Stenose bei ${aorticValveType.toLowerCase()} angelegter Klappe.`;
     }
     let pulmPressureOut = hasPulmPressure ? pulmPressureText : "Kein Hinweis für erhöhte pulmonale Drücke";
     let pericardEffusionOut = hasPericardEffusion ? pericardEffusionText : "Kein Perikarderguss";
@@ -163,6 +165,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
 
     updateDoctorsLetter({
       isLvNormal,
+      aorticValveType,
       lvText,
       ivsd,
       lvedd,
@@ -416,11 +419,9 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                   <RadioGroupItem value="yes" id="atria-yes" />
                   <Label htmlFor="atria-yes">Ja</Label>
                 </div>
-                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="no" id="atria-no" />
                   <Label htmlFor="atria-no">Nein</Label>
-                </div>
-              </RadioGroup>
+                </RadioGroup>
               {isAtriaNormal === false && (
                 <Textarea value={atriaText} onChange={e => setAtriaText(e.target.value)} placeholder="Beschreibung der Abnormalität..." />
               )}
@@ -522,19 +523,31 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
                     </Select>
                   </div>
                   <div>
-                    <Label>Aortenklappe</Label>
-                    <Select value={aorticValve} onValueChange={setAorticValve}>
-                      <SelectTrigger id="aortic-valve">
-                        <SelectValue placeholder="Keine" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Keine">Keine</SelectItem>
-                        <SelectItem value="Stenose">Stenose</SelectItem>
-                        <SelectItem value="Insuffizienz">Insuffizienz</SelectItem>
-                        <SelectItem value="Stenose und -insuffizienz">Stenose und Insuffizienz</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+  <Label>Aortenklappe</Label>
+  <Select value={aorticValve} onValueChange={setAorticValve}>
+    <SelectTrigger id="aortic-valve">
+      <SelectValue placeholder="Keine" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="Keine">Keine</SelectItem>
+      <SelectItem value="Stenose">Stenose</SelectItem>
+      <SelectItem value="Insuffizienz">Insuffizienz</SelectItem>
+      <SelectItem value="Stenose und -insuffizienz">Stenose und Insuffizienz</SelectItem>
+    </SelectContent>
+  </Select>
+  <div className="mt-2">
+    <Label>Klappenart</Label>
+    <Select value={aorticValveType} onValueChange={setAorticValveType}>
+      <SelectTrigger id="aortic-valve-type">
+        <SelectValue placeholder="Triskupid" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="Triskupid">Triskupid</SelectItem>
+        <SelectItem value="Biskupid">Biskupid</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+</div>
                 </div>
               )}
             </div>
