@@ -1,0 +1,15 @@
+
+{
+    "host": "sx-el-121920.ost.ch",
+    "user": "tim.mazhari",
+    "password": "REMOVED",
+    "instanceName": "llm_instance",
+    "containerPath": "/mnt/data/tim.mazhari/sif/qwq32b.sif",
+    "modelPath": "/mnt/data/tim.mazhari/models/qwq32b",
+    "ragModelPath": "/mnt/data/tim.mazhari/models/sentence-transformers/all-mpnet-base-v2",
+    "serverCodePath": "/home/tim.mazhari/llm_server.py",
+    "logPath": "/home/tim.mazhari/llm_server.log",
+    "ragDirectory": "/mnt/data/tim.mazhari/rag/rag_docs",
+    "ragIndexDirectory": "/mnt/data/tim.mazhari/rag/rag_index",
+    "gpus": "5,6,7"
+  }

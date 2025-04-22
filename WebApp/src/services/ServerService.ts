@@ -1,24 +1,17 @@
-import { ServerConfig, ServerStatus, SSHResponse } from "@/lib/types";
+import { ServerStatus, SSHResponse } from "@/lib/types";
 import { toast } from "@/components/ui/use-toast";
+import serverconfig from "@/services/serverconfig.json";
 
 // Default configuration for the server
-const defaultConfig: ServerConfig = {
-  host: "sx-el-121920.ost.ch",
-  user: "tim.mazhari",
-  password: "REMOVED", // In a real application, this would be stored securely
-  instanceName: "llm_instance",
-  containerPath: "/mnt/data/tim.mazhari/sif/qwq32b.sif",
-  modelPath: "/mnt/data/tim.mazhari/models/qwq32b",
-  gpus: "5,6,7"
-};
+const defaultConfig = serverconfig;
 
 // Cache for responses
 const responseCache = new Map<string, string>();
 
 export class ServerService {
-  private config: ServerConfig;
+  private config: typeof serverconfig;
   
-  constructor(config: ServerConfig = defaultConfig) {
+  constructor(config: typeof serverconfig = defaultConfig) {
     this.config = config;
     console.log("ServerService initialized with local Python backend");
   }

@@ -17,13 +17,30 @@ CORS(app, resources={r"/api/*": {"origins": "*"},
                      r"/poll-response": {"origins": "*"},
                      r"/process-pdf": {"origins": "*"}})
 
+serverconfig = json.load(open("../src/services/serverconfig.json"))
+
+host = serverconfig['host']
+user = serverconfig['user']
+password = serverconfig['password']
+instanceName = serverconfig['instanceName']
+containerPath = serverconfig['containerPath']
+modelPath = serverconfig['modelPath']
+ragModelPath = serverconfig['ragModelPath']
+serverCodePath = serverconfig['serverCodePath']
+logPath = serverconfig['logPath']
+ragDirectory = serverconfig['ragDirectory']
+ragIndexDirectory = serverconfig['ragIndexDirectory']
+gpus = serverconfig['gpus']
+
+
+
 # Global SSH client
 ssh_client = None
 
 # Response cache for delayed responses
 response_cache = {}
 
-def get_ssh_connection(config):
+def get_ssh_connection():
     """Establish SSH connection using provided config"""
     global ssh_client
     
@@ -35,9 +52,9 @@ def get_ssh_connection(config):
     
     try:
         ssh_client.connect(
-            hostname=config.get('host'),
-            username=config.get('user'),
-            password=config.get('password')
+            hostname=host,
+            username=user,
+            password=password
         )
         return ssh_client
     except Exception as e:
@@ -57,39 +74,35 @@ def run_ssh_command(ssh_client, command):
     except Exception as e:
         return "", f"Command execution error: {str(e)}"
 
-def check_server_status(ssh_client, config):
+def check_server_status(ssh_client):
     """Check if the LLM server is running"""
-    instance_name = config.get('instanceName')
     
     # Check if the Apptainer instance is running
-    check_instance_command = f"apptainer instance list | grep {instance_name}"
+    check_instance_command = f"apptainer instance list | grep {instanceName}"
     instance_output, instance_error = run_ssh_command(ssh_client, check_instance_command)
     
     # Check if the LLM server is running on port 5000
-    check_server_command = f"apptainer exec instance://{instance_name} nc -z localhost 5000 && echo 'running' || echo 'not running'"
+    check_server_command = f"apptainer exec instance://{instanceName} nc -z localhost 5000 && echo 'running' || echo 'not running'"
     server_status, server_error = run_ssh_command(ssh_client, check_server_command)
     
     return instance_output, server_status, server_error
 
-def start_server(ssh_client, config):
+def start_server(ssh_client):
     """Start the LLM server if it's not running"""
-    instance_name = config.get('instanceName')
-    container_path = config.get('containerPath')
-    gpus = config.get('gpus')
     
     # Check instance
-    instance_output, server_status, server_error = check_server_status(ssh_client, config)
+    instance_output, server_status, server_error = check_server_status(ssh_client)
     # If instance is not running, start it
-    if instance_name not in instance_output:
+    if instanceName not in instance_output:
         set_gpu_command = f"export APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus}"
         run_ssh_command(ssh_client, set_gpu_command)
         
-        start_instance_command = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer instance start --nv {container_path} {instance_name}"
+        start_instance_command = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer instance start --nv {containerPath} {instanceName}"
         run_ssh_command(ssh_client, start_instance_command)
     
     # If server is not running, start it
     if "not running" in server_status:
-        start_server_command = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instance_name} nohup python3 /home/tim.mazhari/llm_server.py > /home/tim.mazhari/llm_server.log 2>&1 &"
+        start_server_command = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instanceName} nohup python3 {serverCodePath} > {logPath} 2>&1 &"
         run_ssh_command(ssh_client, start_server_command)
         
         # Poll until server is ready (max 180 seconds)
@@ -98,7 +111,7 @@ def start_server(ssh_client, config):
         elapsed = 0
         
         while elapsed < timeout:
-            check_ready_cmd = f"apptainer exec instance://{instance_name} nc -z localhost 5000 && echo 'ready' || echo 'not ready'"
+            check_ready_cmd = f"apptainer exec instance://{instanceName} nc -z localhost 5000 && echo 'ready' || echo 'not ready'"
             ready_status, _ = run_ssh_command(ssh_client, check_ready_cmd)
             if "ready" == ready_status:
                 return True
@@ -110,16 +123,13 @@ def start_server(ssh_client, config):
     else:
         return True
 
-def generate_cache_key(query, config):
+def generate_cache_key(query):
     """Generate a cache key for a query"""
-    instance_name = config.get('instanceName', 'default')
-    gpus = config.get('gpus', '0')
-    return f"{query}_{instance_name}_{gpus}"
+   
+    return f"{query}_{instanceName}_{gpus}"
 
-def execute_prompt(ssh_client, config, query, use_rag=False):
+def execute_prompt(ssh_client, query, use_rag=False):
     """Execute prompt on the LLM server"""
-    instance_name = config.get('instanceName')
-    gpus = config.get('gpus')
     
     # Escape single quotes in the query
     escaped_query = query.replace("'", "'\\''")
@@ -128,10 +138,10 @@ def execute_prompt(ssh_client, config, query, use_rag=False):
         escaped_query = "_USE_RAG_ " + escaped_query
     
     # Generate a cache key for this query
-    cache_key = generate_cache_key(query, config)
+    cache_key = generate_cache_key(query)
     
     # Send query to LLM server
-    cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instance_name} bash -c \"echo '{escaped_query}' | nc localhost 5000\""
+    cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instanceName} bash -c \"echo '{escaped_query}' | nc localhost 5000\""
     output, error = run_ssh_command(ssh_client, cmd)
     
     # Store the response in the cache to be available for polling
@@ -140,9 +150,9 @@ def execute_prompt(ssh_client, config, query, use_rag=False):
     return {"success": True, "response": output}
   
 
-def poll_response(ssh_client, config, query):
+def poll_response(ssh_client, query):
     """Poll for a response that might have been delayed"""
-    cache_key = generate_cache_key(query, config)
+    cache_key = generate_cache_key(query)
     
     # Check if we have a cached response
     if cache_key in response_cache:
@@ -150,11 +160,9 @@ def poll_response(ssh_client, config, query):
     
     # No cached response, try to get a fresh one
     # This could be modified to check logs or other sources
-    instance_name = config.get('instanceName')
-    gpus = config.get('gpus')
     
     # Try to check if there's an updated response available
-    check_cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instance_name} bash -c \"cat /home/tim.mazhari/llm_server.log | grep -A 10 '{query}' | tail -1\""
+    check_cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instanceName} bash -c \"cat {logPath} | grep -A 10 '{query}' | tail -1\""
     output, error = run_ssh_command(ssh_client, check_cmd)
     
     if output and not error:
@@ -164,18 +172,15 @@ def poll_response(ssh_client, config, query):
     else:
         return {"success": False, "message": "No delayed response available"}
 
-def process_pdf(ssh_client, config, file_path):
+def process_pdf(ssh_client, file_path):
     """Process PDF for RAG capabilities"""
-    instance_name = config.get('instanceName')
-    gpus = config.get('gpus')
     
     # Upload file to remote
-    remote_dir = "/mnt/data/tim.mazhari/rag/rag_docs"
     file_name = os.path.basename(file_path)
-    remote_path = f"{remote_dir}/{file_name}"
+    remote_path = f"{ragDirectory}/{file_name}"
     
     # Create directory
-    run_ssh_command(ssh_client, f"mkdir -p {remote_dir}")
+    run_ssh_command(ssh_client, f"mkdir -p {ragDirectory}")
     
     # Upload file
     try:
@@ -194,14 +199,14 @@ from langchain_community.vectorstores import FAISS
 import os
 
 pdf_path = \\"{remote_path}\\"
-index_dir = \\"/mnt/data/tim.mazhari/rag/rag_index\\"
+index_dir = \\"{ragIndexDirectory}\\"
 print(\\"Processing PDF: {file_name}\\")
 loader = PyPDFLoader(pdf_path)
 splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 docs = loader.load_and_split(splitter)
 
 embeddings = HuggingFaceEmbeddings(
-    model_name=\\"/mnt/data/tim.mazhari/models/sentence-transformers/all-mpnet-base-v2\\",
+    model_name=\\"{ragModelPath}\\",
     model_kwargs={{\\\"device\\\": \\\"cuda\\\"}}
 )
 
@@ -215,7 +220,7 @@ vectorstore.save_local(index_dir)
 print(\\"PDF_SUCCESS\\")
 """
     escaped_cmd = process_cmd.replace("'", "'\\''")
-    cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instance_name} python3 -c \"{escaped_cmd}\" | nc localhost 5000"
+    cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instanceName} python3 -c \"{escaped_cmd}\" | nc localhost 5000"
     output, error = run_ssh_command(ssh_client, cmd)
     
     if "PDF_SUCCESS" in output:
@@ -243,25 +248,12 @@ def api_home():
 def get_status():
     """Check server status"""
     try:
-        config = request.args.get('config', None)
-        
-        if not config:
-            config = {
-                "host": "sx-el-121920.ost.ch",
-                "user": "tim.mazhari",
-                "password": "REMOVED",
-                "instanceName": "llm_instance",
-                "containerPath": "/mnt/data/tim.mazhari/sif/qwq32b.sif",
-                "modelPath": "/mnt/data/tim.mazhari/models/qwq32b",
-                "gpus": "5,6,7"
-            }
-        
-        ssh_client = get_ssh_connection(config)
+        ssh_client = get_ssh_connection()
         
         if not ssh_client:
             return jsonify({"running": False, "message": "Failed to establish SSH connection"})
                 
-        instance_output, server_status, server_error = check_server_status(ssh_client, config)
+        instance_output, server_status, server_error = check_server_status(ssh_client)
         running = not ("not running" in server_status)
         
         return jsonify({
@@ -276,8 +268,7 @@ def get_status():
 def start():
     """Start the server"""
     try:
-        config = request.json
-        ssh_client = get_ssh_connection(config)
+        ssh_client = get_ssh_connection()
         
         if not ssh_client:
             return jsonify({
@@ -285,7 +276,7 @@ def start():
                 "message": "Failed to establish SSH connection"
             })
         
-        success = start_server(ssh_client, config)
+        success = start_server(ssh_client)
         return jsonify({
             "success": success,
             "message": f"Server {'started successfully' if success else 'failed to start'}"
@@ -300,9 +291,8 @@ def query():
         data = request.json
         query = data.get('query', '')
         use_rag = data.get('use_rag', False)
-        config = data.get('config', {})
         
-        ssh_client = get_ssh_connection(config)
+        ssh_client = get_ssh_connection()
         
         if not ssh_client:
             return jsonify({
@@ -311,7 +301,7 @@ def query():
             })
         
         # Make sure server is running
-        server_started = start_server(ssh_client, config)
+        server_started = start_server(ssh_client)
         
         if not server_started:
             return jsonify({
@@ -320,7 +310,7 @@ def query():
             })
         
         # Execute the query
-        result = execute_prompt(ssh_client, config, query, use_rag)
+        result = execute_prompt(ssh_client, query, use_rag)
         return jsonify(result)
     except Exception as e:
         return jsonify({"success": False, "message": f"Error executing query: {str(e)}"})
@@ -331,9 +321,8 @@ def poll_response_endpoint():
     try:
         data = request.json
         query = data.get('query', '')
-        config = data.get('config', {})
         
-        ssh_client = get_ssh_connection(config)
+        ssh_client = get_ssh_connection()
         
         if not ssh_client:
             return jsonify({
@@ -342,7 +331,7 @@ def poll_response_endpoint():
             })
         
         # Poll for response
-        result = poll_response(ssh_client, config, query)
+        result = poll_response(ssh_client, query)
         return jsonify(result)
     except Exception as e:
         return jsonify({"success": False, "message": f"Error polling for response: {str(e)}"})
@@ -355,8 +344,7 @@ def process_pdf_endpoint():
             return jsonify({"success": False, "message": "No file provided"})
         
         file = request.files['file']
-        config_str = request.form.get('config', '{}')
-        
+
         if file.filename == '':
             return jsonify({"success": False, "message": "No file selected"})
         
@@ -364,13 +352,10 @@ def process_pdf_endpoint():
         temp_dir = tempfile.gettempdir()
         temp_file_path = os.path.join(temp_dir, file.filename)
         file.save(temp_file_path)
-        
-        # Get config
-        import json
-        config = json.loads(config_str)
+    
         
         # Process the PDF
-        ssh_client = get_ssh_connection(config)
+        ssh_client = get_ssh_connection()
         
         if not ssh_client:
             return jsonify({
@@ -379,7 +364,7 @@ def process_pdf_endpoint():
             })
         
         # Make sure server is running
-        server_started = start_server(ssh_client, config)
+        server_started = start_server(ssh_client)
         
         if not server_started:
             return jsonify({
@@ -388,7 +373,7 @@ def process_pdf_endpoint():
             })
         
         # Process the PDF
-        result = process_pdf(ssh_client, config, temp_file_path)
+        result = process_pdf(ssh_client, temp_file_path)
         
         # Clean up
         os.remove(temp_file_path)

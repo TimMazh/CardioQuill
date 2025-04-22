@@ -38,6 +38,6 @@ The default server configuration is:
 - Instance Name: llm_instance
 - Container Path: /mnt/data/tim.mazhari/sif/qwq32b.sif
 - Model Path: /mnt/data/tim.mazhari/models/qwq32b
-- GPUs: 5,6,7
+- GPUs: dynamic (eg. 5,6,7)
 
 You can modify these values in the frontend application or by passing a different configuration to the API endpoints.
