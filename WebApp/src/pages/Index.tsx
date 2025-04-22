@@ -164,6 +164,8 @@ const Index = () => {
             <TabsTrigger value="ecg-analysis">EKG-Auswertung</TabsTrigger>
             <TabsTrigger value="transthoracic-echocardiography">Echo</TabsTrigger>
             <TabsTrigger value="ergometry">Ergometrie</TabsTrigger>
+            <TabsTrigger value="lz-ekg">LZ-EKG</TabsTrigger>
+            <TabsTrigger value="ct-koronarangiographie">CT-Koronarangiographie</TabsTrigger>
           </TabsList>
           
           <div className="space-y-4">
@@ -190,7 +192,7 @@ const Index = () => {
                 placeholder="Diagnose beschreiben..." 
               />
             </TabsContent>
-            
+
             <TabsContent value="risk-factors">
               <TextSection 
                 title="Kardiovaskuläre Risikofaktoren" 
@@ -266,6 +268,25 @@ const Index = () => {
               <ErgometrySection
                 doctorsLetter={doctorsLetter}
                 updateDoctorsLetter={updateDoctorsLetter}
+              />
+            </TabsContent>
+            <TabsContent value="lz-ekg">
+              <TextSection
+                title="LZ-EKG"
+                field="lzEkg"
+                doctorsLetter={doctorsLetter}
+                updateDoctorsLetter={updateDoctorsLetter}
+                placeholder="LZ-EKG-Befund eintragen..."
+              />
+            </TabsContent>
+
+            <TabsContent value="ct-koronarangiographie">
+              <TextSection
+                title="CT-Koronarangiographie"
+                field="ctKoronarangiographie"
+                doctorsLetter={doctorsLetter}
+                updateDoctorsLetter={updateDoctorsLetter}
+                placeholder="CT-Koronarangiographie-Befund eintragen..."
               />
             </TabsContent>
           </div>
