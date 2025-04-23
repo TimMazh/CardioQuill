@@ -13,13 +13,14 @@ interface IntroSectionProps {
 
 export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectionProps) {
   const [greeting, setGreeting] = useState(doctorsLetter.greeting || "Sehr geehrte");
-  
+  const [mode, setMode] = useState(doctorsLetter.mode || 'regulaer');
 
-  // Update intro text when greeting changes or relevant patient/doctor data changes
+  // Update intro text when greeting or mode changes or relevant patient/doctor data changes
   useEffect(() => {
     updateIntroText();
   }, [
     greeting, 
+    mode,
     doctorsLetter.patientLastName, 
     doctorsLetter.patientGender, 
     doctorsLetter.patientDateOfBirth,
@@ -39,7 +40,7 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
       doctorGender = "",
       doctorLastName = "Arztnachname",
       doctorFirstName = "Arztvorname",
-      patientControlDate = "dem heutigen Datum"
+      patientControlDate = "dem heutigen Datum",
     } = doctorsLetter;
 
     // Gender-based text
@@ -65,12 +66,18 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
       : `${doctorPronoun}${doctorTitle ? ' ' + doctorTitle : ''} ${doctorLastName}`;
 
     // Generate the text
+    let modeText = '';
+    if (mode === 'regulaer') {
+      modeText = `Gerne berichte ich über die reguläre kardiologische Verlaufskontrolle`;
+    } else {
+      modeText = `Gerne berichte ich über die notfallmässige Vorstellung`;
+    }
     const introText = 
       `${formattedGreeting} ${doctorAddress},\n\n` +
-      `Gerne berichte ich über die kardiologische Verlaufskontrolle ${commonPatient} ` +
+      `${modeText} ${commonPatient} ` +
       `${patientPronoun} ${patientLastName}, ${patientArticle} sich am ${patientControlDate} in meiner Praxis vorgestellt hatte.\n`;
 
-    updateDoctorsLetter({ introText, greeting });
+    updateDoctorsLetter({ introText, greeting, mode });
   };
 
   const handleGreetingChange = (value: "Liebe" | "Sehr geehrte") => {
@@ -104,6 +111,28 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
           </RadioGroup>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Vorstellungsart</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            value={mode}
+            onValueChange={(value) => setMode(value as 'regulaer' | 'notfall')}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="regulaer" id="mode-regulaer" />
+              <Label htmlFor="mode-regulaer">Regulär</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="notfall" id="mode-notfall" />
+              <Label htmlFor="mode-notfall">Notfallmässig</Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
       
       <Card>
         <CardHeader>
@@ -114,6 +143,7 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
             className="min-h-[200px]"
             placeholder="Hier erscheint der generierte Einleitungstext..."
             readOnly
+            value={doctorsLetter.introText}
           />
         </CardContent>
       </Card>
