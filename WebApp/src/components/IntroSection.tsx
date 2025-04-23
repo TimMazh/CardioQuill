@@ -113,8 +113,7 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
           <Textarea 
             className="min-h-[200px]"
             placeholder="Hier erscheint der generierte Einleitungstext..."
-            value={doctorsLetter.introText || ""}
-            onChange={handleTextChange}
+            readOnly
           />
         </CardContent>
       </Card>

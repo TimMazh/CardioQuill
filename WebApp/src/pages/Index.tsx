@@ -9,7 +9,6 @@ import { PhysicalExaminationSection } from "@/components/PhysicalExaminationSect
 import { ControlPanel } from "@/components/ControlPanel";
 import { UploadPDFDialog } from "@/components/UploadPDFDialog";
 import { QueryPanel } from "@/components/QueryPanel";
-import { PythonBackendInfo } from "@/components/PythonBackendInfo";
 import { DoctorsLetter, ServerStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/mockBackend";
@@ -122,15 +121,18 @@ const Index = () => {
     }
     setAppStatus("ready");
     setPdfDialogOpen(false);
+    
   };
   
   // Clear all fields
   const handleClearFields = () => {
     setDoctorsLetter({});
+    
     toast({
       title: "Felder gelöscht",
       description: "Alle Felder wurden zurückgesetzt.",
     });
+    window.location.reload();
   };
   
   // Toggle RAG
@@ -148,7 +150,23 @@ const Index = () => {
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">CardioVista - Medical Scribe</h1>
           <p className="text-muted-foreground">Medizinische Berichte und Kardiologische Analysen</p>
+          <ControlPanel 
+          onGenerateReport={handleGenerateReport}
+          onUploadPDF={() => handleUploadPDF()}
+          onClearFields={handleClearFields}
+          ragEnabled={ragEnabled}
+          onToggleRAG={handleToggleRAG}
+          appStatus={appStatus}
+          serverStatus={serverStatus}
+        />
+        
+        <UploadPDFDialog
+          open={pdfDialogOpen}
+          onOpenChange={setPdfDialogOpen}
+          onUpload={handleUploadPDF}
+        />
         </header>
+        
         
         <Tabs defaultValue="master-data" onValueChange={handleTabChange}>
           <TabsList className="mb-4 flex flex-wrap gap-2">
@@ -292,22 +310,8 @@ const Index = () => {
           </div>
         </Tabs>
         
-        <ControlPanel 
-          onGenerateReport={handleGenerateReport}
-          onUploadPDF={() => handleUploadPDF()}
-          onClearFields={handleClearFields}
-          ragEnabled={ragEnabled}
-          onToggleRAG={handleToggleRAG}
-          appStatus={appStatus}
-          serverStatus={serverStatus}
-        />
         
-        <UploadPDFDialog
-          open={pdfDialogOpen}
-          onOpenChange={setPdfDialogOpen}
-          onUpload={handleUploadPDF}
-        />
-        
+      
         {/* Query Panel for LLM Interaction */}
         <QueryPanel 
           ragEnabled={ragEnabled}
@@ -316,8 +320,6 @@ const Index = () => {
           }}
         />
         
-        {/* Python Backend Information */}
-        <PythonBackendInfo />
       </div>
     </div>
   );
