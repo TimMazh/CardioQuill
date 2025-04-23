@@ -438,7 +438,7 @@ export function PhysicalExaminationSection({
       {/* Full width text output */}
       <Card className="col-span-1 md:col-span-2">
         <CardHeader>
-          <CardTitle>Generierter Text</CardTitle>
+          <CardTitle>Körperliche Untersuchung Text</CardTitle>
         </CardHeader>
         <CardContent>
           <Textarea 

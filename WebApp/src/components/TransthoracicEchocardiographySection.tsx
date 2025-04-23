@@ -619,7 +619,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
         </div>
         {/* Generierter Text */}
         <div className="bg-background p-4 rounded-md border">
-          <h3 className="text-lg font-medium mb-4">Generierter Text</h3>
+          <h3 className="text-lg font-medium mb-4">Transthorakale Echokardiographie Text</h3>
           <Textarea className="min-h-[150px]" value={outputText} readOnly />
         </div>
       </CardContent>

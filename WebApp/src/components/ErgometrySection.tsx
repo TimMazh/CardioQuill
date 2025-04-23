@@ -343,7 +343,7 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
   </div>
   {/* Generierter Text */}
   <div className="bg-background p-4 rounded-md border">
-    <h3 className="text-lg font-medium mb-4">Generierter Text</h3>
+    <h3 className="text-lg font-medium mb-4">Ergometrie Text</h3>
     <Textarea className="min-h-[120px]" value={outputText} readOnly />
   </div>
 </CardContent>
