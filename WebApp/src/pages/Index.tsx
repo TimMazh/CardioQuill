@@ -13,6 +13,7 @@ import { DoctorsLetter, ServerStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/mockBackend";
 import { TransthoracicEchocardiographySection } from "@/components/TransthoracicEchocardiographySection";
+import WordExport from "./WordExport";
 
 const Index = () => {
   const { toast } = useToast();
@@ -184,6 +185,7 @@ const Index = () => {
             <TabsTrigger value="ergometry">Ergometrie</TabsTrigger>
             <TabsTrigger value="lz-ekg">LZ-EKG</TabsTrigger>
             <TabsTrigger value="ct-koronarangiographie">CT-Koronarangiographie</TabsTrigger>
+            <TabsTrigger value="word-export">Word-Export</TabsTrigger>
           </TabsList>
           
           <div className="space-y-4">
@@ -307,6 +309,12 @@ const Index = () => {
                 placeholder="CT-Koronarangiographie-Befund eintragen..."
               />
             </TabsContent>
+            <TabsContent value="word-export">
+              <WordExport
+                doctorsLetter={doctorsLetter}
+                updateDoctorsLetter={updateDoctorsLetter}
+              />
+            </TabsContent>
           </div>
         </Tabs>
         
@@ -319,6 +327,7 @@ const Index = () => {
             setAppStatus(isProcessing ? "processing" : "ready");
           }}
         />
+
         
       </div>
     </div>

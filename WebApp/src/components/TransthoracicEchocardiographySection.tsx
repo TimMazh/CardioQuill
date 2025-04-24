@@ -205,7 +205,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       hasPericardEffusion,
       pericardEffusionText,
       hasPleuralEffusion,
-      pleuralEffusionText
+      pleuralEffusionText,
+      transthoracicEchocardiography: text
     })
   };
   return (
@@ -620,7 +621,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
         {/* Generierter Text */}
         <div className="bg-background p-4 rounded-md border">
           <h3 className="text-lg font-medium mb-4">Transthorakale Echokardiographie Text</h3>
-          <Textarea className="min-h-[150px]" value={outputText} readOnly />
+          <Textarea className="min-h-[150px]" value={doctorsLetter.transthoracicEchocardiography || ""} readOnly />
         </div>
       </CardContent>
     </Card>

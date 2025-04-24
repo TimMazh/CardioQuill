@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DoctorsLetter } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
 
 interface IntroSectionProps {
   doctorsLetter: DoctorsLetter;
@@ -72,10 +73,11 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
     } else {
       modeText = `Gerne berichte ich über die notfallmässige Vorstellung`;
     }
+    
     const introText = 
-      `${formattedGreeting} ${doctorAddress},\n\n` +
+      `${formattedGreeting} ${doctorAddress}\n\n` +
       `${modeText} ${commonPatient} ` +
-      `${patientPronoun} ${patientLastName}, ${patientArticle} sich am ${patientControlDate} in meiner Praxis vorgestellt hatte.\n`;
+      `${patientPronoun} ${patientLastName}, ${patientArticle} sich am ${formatDate(patientControlDate)} in meiner Praxis vorgestellt hatte.\n`;
 
     updateDoctorsLetter({ introText, greeting, mode });
   };

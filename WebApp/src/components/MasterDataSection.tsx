@@ -19,6 +19,7 @@ interface MasterDataSectionProps {
 
 export function MasterDataSection({ doctorsLetter, updateDoctorsLetter }: MasterDataSectionProps) {
   const handleChange = (field: keyof DoctorsLetter, value: string) => {
+    
     updateDoctorsLetter({ [field]: value });
   };
 
@@ -91,7 +92,7 @@ export function MasterDataSection({ doctorsLetter, updateDoctorsLetter }: Master
               <Input 
                 id="patientControlDate"
                 type="date"
-                value={doctorsLetter.patientControlDate || new Date().toISOString().split('T')[0]}
+                value={doctorsLetter.patientControlDate || ""}
                 onChange={(e) => handleChange("patientControlDate", e.target.value)}
               />
             </div>

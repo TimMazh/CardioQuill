@@ -170,7 +170,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
       rhythmFrequency,
       extrasystole,
       extrasystoleFrequency,
-      extrasystoleTypes
+      extrasystoleTypes,
+      ecgAnalysis: ecgAnalysisText
     });
   };
 
@@ -509,7 +510,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
           <h3 className="text-lg font-medium mb-4">12-Kanal-Ruhe-EKG / Rhytmusstreifen Text</h3>
           <Textarea 
             className="min-h-[150px]" 
-            value={outputText} 
+            value={doctorsLetter.ecgAnalysis || ""} 
             readOnly 
           />
         </div>

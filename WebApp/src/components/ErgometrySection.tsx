@@ -116,7 +116,8 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
       hasRhythmDisturbance,
       rhythmDisturbanceText,
       hasStChangesErgo,
-      stLeadsErgo
+      stLeadsErgo,
+      ergometry: text
     });
   };
 
@@ -344,7 +345,7 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
   {/* Generierter Text */}
   <div className="bg-background p-4 rounded-md border">
     <h3 className="text-lg font-medium mb-4">Ergometrie Text</h3>
-    <Textarea className="min-h-[120px]" value={outputText} readOnly />
+    <Textarea className="min-h-[120px]" value={doctorsLetter.ergometry || ""} readOnly />
   </div>
 </CardContent>
 </Card>);
