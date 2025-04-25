@@ -82,7 +82,7 @@ export interface DoctorsLetter {
   qWaveLeads?: string[];
   hasSTChanges?: boolean;
   stChangesText?: string;
-  hasRProgression?: boolean;
+  hasRegularRProgression?: boolean;
   rProgressionText?: string;
   rhythmContinuity?: string;
   rhythmContinuityText?: string;

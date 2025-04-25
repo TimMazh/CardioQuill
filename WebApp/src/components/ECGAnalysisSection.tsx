@@ -31,7 +31,9 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
   const [qWaveLeads, setQWaveLeads] = useState<string[]>(doctorsLetter.qWaveLeads || []);
   const [hasSTChanges, setHasSTChanges] = useState(doctorsLetter.hasSTChanges || false);
   const [stChangesText, setSTChangesText] = useState(doctorsLetter.stChangesText || "");
-  const [hasRProgression, setHasRProgression] = useState(doctorsLetter.hasRProgression || false);
+  const [hasRegularRProgression, setHasRegularRProgression] = useState(
+      typeof doctorsLetter.hasRegularRProgression === "boolean" ? doctorsLetter.hasRegularRProgression : true
+    );
   const [rProgressionText, setRProgressionText] = useState(doctorsLetter.rProgressionText || "");
   const [rhythmContinuity, setRhythmContinuity] = useState(doctorsLetter.rhythmContinuity || "durchgehend");  
   const [rhythmContinuityText, setRhythmContinuityText] = useState(doctorsLetter.rhythmContinuityText || "");
@@ -48,7 +50,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     updateECGAnalysisText();
   }, [
     sinusRate, lagetyp, pq, qrs, qtc, hasPathologicalQ, qWaveLeads, 
-    hasSTChanges, stChangesText, hasRProgression, rProgressionText,
+    hasSTChanges, stChangesText, hasRegularRProgression, rProgressionText,
     rhythmContinuity, rhythmFrequency, extrasystole, 
     extrasystoleFrequency, extrasystoleTypes, rhythmContinuityText
   ]);
@@ -121,10 +123,10 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
 
     // Regelrechte R-Progression
     let rProgressionText2 = "";
-    if (hasRProgression && rProgressionText) {
+    if (!(hasRegularRProgression && rProgressionText)) {
       rProgressionText2 = `${rProgressionText}.`;
     } else {
-      rProgressionText2 = "Keine spezifische R-Progression.";
+      rProgressionText2 = "Regelrechte R-Progression.";
     }
 
     // Rhythmusstreifen
@@ -163,7 +165,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
       qWaveLeads,
       hasSTChanges,
       stChangesText,
-      hasRProgression,
+      hasRegularRProgression,
       rProgressionText,
       rhythmContinuity,
       rhythmContinuityText,
@@ -369,8 +371,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             <div className="space-y-2">
               <Label>Regelrechte R-Progression?</Label>
               <RadioGroup 
-                value={hasRProgression ? "yes" : "no"} 
-                onValueChange={(value) => setHasRProgression(value === "yes")}
+                value={hasRegularRProgression ? "yes" : "no"} 
+                onValueChange={(value) => setHasRegularRProgression(value === "yes")}
                 className="flex space-x-4"
               >
                 <div className="flex items-center space-x-2">
@@ -383,7 +385,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
                 </div>
               </RadioGroup>
             </div>
-            {hasRProgression && (
+            {!hasRegularRProgression && (
               <Textarea 
                 className="min-h-[40px]"
                 value={rProgressionText}

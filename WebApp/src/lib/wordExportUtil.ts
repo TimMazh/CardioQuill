@@ -1,12 +1,15 @@
 import { DoctorsLetter } from "./types";
 import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
 import { formatDate } from "./utils";
+import { fetchLLMSummary } from "./llmSummary";
 
 
 
 
 
 export async function generateWordDocument(letter: DoctorsLetter): Promise<Blob> {
+  // Hole die LLM-Zusammenfassung
+  const llmSummary = await fetchLLMSummary(letter);
   const today = new Date();
   const dateStr = today.toLocaleDateString("de-CH", { day: "2-digit", month: "long", year: "numeric" });
   const patientControlDate = formatDate(letter.patientControlDate);
@@ -100,43 +103,134 @@ export async function generateWordDocument(letter: DoctorsLetter): Promise<Blob>
           })(),
           // Diagnose
           new Paragraph({ children: [new TextRun({ text: "Diagnose:", bold: true })] }),
-          new Paragraph({ text: letter.diagnosis || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.diagnosis || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Kardiovaskuläre Risikofaktoren
           new Paragraph({ children: [new TextRun({ text: "Kardiovaskuläre Risikofaktoren:", bold: true })] }),
-          new Paragraph({ text: letter.cardiovascularRiskFactors || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.cardiovascularRiskFactors || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Nebendiagnosen
           new Paragraph({ children: [new TextRun({ text: "Nebendiagnosen:", bold: true })] }),
-          new Paragraph({ text: letter.secondaryDiagnosis || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.secondaryDiagnosis || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Empfohlene Massnahmen
           new Paragraph({ children: [new TextRun({ text: "Empfohlene Massnahmen:", bold: true })] }),
-          new Paragraph({ text: letter.recommendedProcedure || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.recommendedProcedure || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Anamnese
           new Paragraph({ children: [new TextRun({ text: "Anamnese:", bold: true })] }),
-          new Paragraph({ text: letter.anamnesis || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.anamnesis || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Vormedikation
           new Paragraph({ children: [new TextRun({ text: "Vormedikation:", bold: true })] }),
-          new Paragraph({ text: letter.previousMedication || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.previousMedication || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Körperliche Untersuchung
           new Paragraph({ children: [new TextRun({ text: "Körperliche Untersuchung:", bold: true })] }),
-          new Paragraph({ text: letter.physicalExamination || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.physicalExamination || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // EKG
           new Paragraph({ children: [new TextRun({ text: "12-Kanal-Ruhe-EKG / Rhythmusstreifen", bold: true })] }),
-          new Paragraph({ text: letter.ecgAnalysis || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.ecgAnalysis || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Echo
           new Paragraph({ children: [new TextRun({ text: "Transthorakale Echokardiographie:", bold: true })] }),
-          new Paragraph({ text: letter.transthoracicEchocardiography || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.transthoracicEchocardiography || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Ergometrie
           new Paragraph({ children: [new TextRun({ text: "Ergometrie:", bold: true })] }),
-          new Paragraph({ text: letter.ergometry || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.ergometry || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // LZ-EKG
           new Paragraph({ children: [new TextRun({ text: `6d- / 24h-LZ-EKG vom ${patientControlDate || "[Kontrolldatum]"}:`, bold: true })] }),
-          new Paragraph({ text: letter.lzEkg || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.lzEkg || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // CT-Koronarangiographie
           new Paragraph({ children: [new TextRun({ text: `CT-Koronarangiographie vom ${patientControlDate || "[Kontrolldatum]"}:`, bold: true })] }),
-          new Paragraph({ text: letter.ctKoronarangiographie  || "", spacing: { after: 200 } }),
+          new Paragraph({
+  children: (letter.ctKoronarangiographie  || "").split("\n").flatMap((line, idx, arr) =>
+    idx < arr.length - 1
+      ? [new TextRun(line), new TextRun({ break: 1 })]
+      : [new TextRun(line)]
+  ),
+  spacing: { after: 200 }
+}),
           // Zusammenfassende Beurteilung
           new Paragraph({ children: [new TextRun({ text: "Zusammenfassende Beurteilung:", bold: true })] }),
-          new Paragraph("Blablabla"),
+          new Paragraph({
+            children: (llmSummary || "").split("\n").flatMap((line, idx, arr) =>
+              idx < arr.length - 1
+                ? [new TextRun(line), new TextRun({ break: 1 })]
+                : [new TextRun(line)]
+            ),
+            spacing: { after: 200 }
+          }),
         ],
       },
     ],
