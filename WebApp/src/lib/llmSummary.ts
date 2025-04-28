@@ -24,14 +24,19 @@ export async function fetchLLMSummary(letter: DoctorsLetter): Promise<string> {
     `LZ-EKG: ${letter.lzEkg || ""}`,
     `CT-Koronarangiographie: ${letter.ctKoronarangiographie || ""}`
   ];
-  const infoText = fields.join("\n");
+  const infoText = fields.join("\n---\n");
   ragStorage.addDoc(infoText);
 
   // 3. Prompt für LLM bauen, der Storage als Wissensbasis nutzt
-  const ragContext = ragStorage.getAllDocs().join("\n\n").replace(/\u2022/g, "-");
-  const prompt = `_TEMP_RAG_ Du bist jetzt professioneller Kardiologe. Erstelle eine zusammenfassende Beurteilung für einen Arztbrief basierend auf folgendem Kontext:\n${ragContext}`;
-
+  const prompt = ragStorage.getAllDocs().join("\n\n").replace(/\u2022/g, "-");
+  console.log(prompt);
   // 4. Prompt mit speziellem RAG-Präfix absenden (Backend muss _TEMP_RAG_ erkennen!)
-  const summary = await serverService.executePrompt(prompt, false);
-  return summary;
+  const rawSummary = await serverService.executePrompt(prompt, true);
+  // Extrahiere den ersten Block zwischen --- ... ---
+  const match = rawSummary.match(/---\s*([\s\S]*?)\s*---/);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+  // Fallback: falls kein Block gefunden, gib alles zurück
+  return rawSummary.trim();
 }

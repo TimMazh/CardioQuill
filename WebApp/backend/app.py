@@ -67,10 +67,12 @@ def run_ssh_command(ssh_client, command):
         return "", "SSH connection not established"
     
     try:
-        stdin, stdout, stderr = ssh_client.exec_command(command)
-        output = stdout.read().decode().strip()
-        error = stderr.read().decode().strip()
-        return output, error
+        stdin, stdout, stderr = ssh_client.exec_command(command, timeout=600)
+        # Warte, bis das Kommando fertig ist
+        exit_status = stdout.channel.recv_exit_status()  # Blockiert, bis fertig
+        output = stdout.read().decode("utf-8")
+        error = stderr.read().decode("utf-8")
+        return output, error    
     except Exception as e:
         return "", f"Command execution error: {str(e)}"
 
@@ -136,76 +138,17 @@ from fpdf import FPDF
 def execute_prompt(ssh_client, query, use_rag=False):
     """Execute prompt on the LLM server. Unterstützt _USE_RAG_ (persistenter Index) und _TEMP_RAG_ (temporärer Kontext direkt im Prompt)."""
     import tempfile
-    if query.startswith("_TEMP_RAG_"):
-        # 1. Temp-RAG-Verzeichnis fest (kein UUID):
-        temp_rag_dir = "/mnt/data/tim.mazhari/rag/temp_rag"
-        temp_index_dir = f"{temp_rag_dir}/rag_index"  # Index und Docs im selben Verzeichnis
-        temp_docs_dir = f"{temp_rag_dir}/rag_docs"
-        temp_doc_path = f"{temp_docs_dir}/temp_brief.pdf"
-        temp_context = query[len("_TEMP_RAG_"):].lstrip()
-
-        run_ssh_command(ssh_client, f"mkdir -p {temp_rag_dir}")
-        run_ssh_command(ssh_client, f"mkdir -p {temp_index_dir}")
-        run_ssh_command(ssh_client, f"mkdir -p {temp_docs_dir}")
-        # 2b. temp_brief.pdf lokal erzeugen
-        import tempfile, os
-        fd, local_temp_brief = tempfile.mkstemp(suffix=".pdf")
-        os.close(fd)
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_font("Arial", size=12)
-        for line in temp_context.splitlines():
-            pdf.multi_cell(0, 10, line)
-        pdf.output(local_temp_brief)
-        print(f"[DEBUG] PDF written: {local_temp_brief}, Size: {os.path.getsize(local_temp_brief)} bytes")
-        # 2c. temp_brief.pdf auf Server hochladen
-        try:
-            sftp = ssh_client.open_sftp()
-            sftp.put(local_temp_brief, temp_doc_path)
-            sftp.close()
-        except Exception as e:
-            print(e)
-            os.remove(local_temp_brief)
-            return {"success": False, "message": f"TempRAG File upload error: {str(e)}"}
-        print(f"[DEBUG] Uploaded PDF to: {temp_doc_path}")
-        # Prüfe remote Existenz/Größe
-        try:
-            sftp = ssh_client.open_sftp()
-            stat = sftp.stat(temp_doc_path)
-            print(f"[DEBUG] Remote PDF exists: True, Size: {stat.st_size} bytes")
-            sftp.close()
-        except Exception as e:
-            print(f"[DEBUG] Remote PDF exists: False, Error: {e}")
-        process_pdf(ssh_client, temp_doc_path)
-
-        #    return result
-
-        # 4. Retrieval-Prompt mit _USE_RAG_ + temp_index_dir
-        escaped_query = query.replace("'", "'\\''")
-
-        env = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus}"
-        llm_cmd = f"{env} apptainer exec instance://{instanceName} bash -c \"echo '{escaped_query}' | nc localhost 5000\""
-        output, error = run_ssh_command(ssh_client, llm_cmd)
-        # 5. Temp-RAG-Verzeichnis aufräumen
-        run_ssh_command(ssh_client, f"rm -rf {temp_rag_dir}")
-        pdb.set_trace()
-        cache_key = generate_cache_key(query)
-        print(f"[DEBUG] Generated cache key: {output}")
-        if output:
-            response_cache[cache_key] = output
-        return {"success": True, "response": output}
-    else:
-        # Normales Verhalten (inkl. persistentem RAG)
-        escaped_query = query.replace("'", "'\\''")
-        if use_rag:
-            escaped_query = "_USE_RAG_ " + escaped_query
-        cache_key = generate_cache_key(query)
-        cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instanceName} bash -c \"echo '{escaped_query}' | nc localhost 5000\""
-        output, error = run_ssh_command(ssh_client, cmd)
-        if output:
-            response_cache[cache_key] = output
-        return {"success": True, "response": output}
+ 
+    # Normales Verhalten (inkl. persistentem RAG)
+    escaped_query = query.replace("'", "'\\''")
+    if use_rag:
+        escaped_query = "_USE_RAG_ " + escaped_query
+    
+    cache_key = generate_cache_key(query)
+    cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={gpus} apptainer exec instance://{instanceName} bash -c \"echo '{escaped_query}' | nc localhost 5000\""
+    output, error = run_ssh_command(ssh_client, cmd)
+    response_cache[cache_key] = output
+    return {"success": True, "response": output}
   
 
 def poll_response(ssh_client, query):
@@ -238,6 +181,7 @@ def process_pdf(ssh_client, file_path):
         remote_path = f"/mnt/data/tim.mazhari/rag/temp_rag/rag_docs/{file_name}"
         ragIndexDirectory = "/mnt/data/tim.mazhari/rag/temp_rag/rag_index"
     else:
+        ragIndexDirectory = serverconfig['ragIndexDirectory']
         remote_path = f"{ragDirectory}/{file_name}"
          # Create directory
         run_ssh_command(ssh_client, f"mkdir -p {ragIndexDirectory}")

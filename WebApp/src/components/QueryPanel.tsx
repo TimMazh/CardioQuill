@@ -33,7 +33,7 @@ export function QueryPanel({ ragEnabled, onProcessingChange }: QueryPanelProps) 
 
     const pollInterval = 1000; // Poll every second
     let attempts = 0;
-    const maxAttempts = 60; // Maximum 60 seconds of polling
+    const maxAttempts = 60000; // Maximum 600000 seconds of polling
 
     pollingIntervalRef.current = setInterval(async () => {
       if (queryIdRef.current !== currentQueryId || attempts >= maxAttempts) {
