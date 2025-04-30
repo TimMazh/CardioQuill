@@ -7,7 +7,6 @@ import { UploadPDFDialog } from "@/components/UploadPDFDialog";
 import { FileUp } from "lucide-react";
 
 interface ControlPanelProps {
-  onGenerateReport: () => void;
   onUploadPDF: (file: File) => void;
   onClearFields: () => void;
   ragEnabled: boolean;
@@ -19,7 +18,6 @@ interface ControlPanelProps {
 }
 
 export function ControlPanel({
-  onGenerateReport,
   onUploadPDF,
   onClearFields,
   ragEnabled,
@@ -33,8 +31,11 @@ export function ControlPanel({
     <div className="border-t border-border mt-4 pt-4 mb-4">
       <div className="flex flex-wrap items-center gap-3 mb-4 justify-between w-full">
         <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={onGenerateReport} variant="default">
-            Bericht generieren
+          <Button onClick={onWordExport} disabled={isExporting}>
+            {isExporting ? "Export läuft..." : "Word generieren"}
+          </Button>
+          <Button onClick={onClearFields} variant="outline">
+            Alle Felder leeren
           </Button>
           <UploadPDFDialog 
             onUpload={onUploadPDF}
@@ -51,12 +52,7 @@ export function ControlPanel({
           >
             RAG {ragEnabled ? "aktiviert" : "deaktiviert"}
           </Button>
-          <Button onClick={onWordExport} disabled={isExporting}>
-            {isExporting ? "Export läuft..." : "Word generieren"}
-          </Button>
-          <Button onClick={onClearFields} variant="outline">
-            Alle Felder leeren
-          </Button>
+          
         </div>
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 items-end md:items-center ml-auto">
           <StatusIndicator label="Anwendungsstatus" status={appStatus as "ready" | "processing" | "error"} />

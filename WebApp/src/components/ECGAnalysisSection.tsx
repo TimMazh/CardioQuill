@@ -199,11 +199,12 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="sinusRate">Sinusrhythmus (Schläge/Minute):</Label>
+              <Label htmlFor="sinusRate">Sinusrhythmus:</Label>
               <Input 
                 id="sinusRate" 
                 value={sinusRate} 
                 onChange={(e) => setSinusRate(e.target.value)}
+                placeholder="Schläge/Minute"
               />
             </div>
             
@@ -235,29 +236,32 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="pq">PQ (ms):</Label>
+            <Label htmlFor="pq">PQ:</Label>
             <Input 
               id="pq" 
               value={pq} 
               onChange={(e) => setPQ(e.target.value)}
+              placeholder="ms"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="qrs">QRS (ms):</Label>
+            <Label htmlFor="qrs">QRS:</Label>
             <Input 
               id="qrs" 
               value={qrs} 
               onChange={(e) => setQRS(e.target.value)}
+              placeholder="ms"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="qtc">QTc (ms):</Label>
+            <Label htmlFor="qtc">QTc:</Label>
             <Input 
               id="qtc" 
               value={qtc} 
               onChange={(e) => setQTC(e.target.value)}
+              placeholder="ms"
             />
           </div>
         </div>

@@ -180,7 +180,6 @@ const Index = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">CardioVista - Medical Scribe</h1>
           <p className="text-muted-foreground">Medizinische Berichte und Kardiologische Analysen</p>
           <ControlPanel 
-            onGenerateReport={handleGenerateReport}
             onUploadPDF={handleUploadPDF}
             onClearFields={handleClearFields}
             ragEnabled={ragEnabled}
@@ -200,22 +199,24 @@ const Index = () => {
         
         
         <Tabs defaultValue="master-data" onValueChange={handleTabChange}>
-          <TabsList className="mb-4 flex flex-wrap gap-2">
+          <TabsList className="mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {/* Patientendaten */}
             <TabsTrigger value="master-data">Stammdaten</TabsTrigger>
             <TabsTrigger value="intro">Einleitung</TabsTrigger>
-            <TabsTrigger value="diagnosis">Diagnose</TabsTrigger>
+            {/* Diagnostik */}
+            <TabsTrigger value="diagnosis">Diagnosen</TabsTrigger>
             <TabsTrigger value="risk-factors">Kardiovaskuläre Risikofaktoren</TabsTrigger>
             <TabsTrigger value="secondary-diagnosis">Nebendiagnosen</TabsTrigger>
-            <TabsTrigger value="recommended-procedure">Empfohlene Massnahmen</TabsTrigger>
+            <TabsTrigger value="recommended-procedure">Empfohlenes Procedere</TabsTrigger>
             <TabsTrigger value="anamnesis">Anamnese</TabsTrigger>
-            <TabsTrigger value="previous-medication">Vormedikation</TabsTrigger>
+            <TabsTrigger value="previous-medication">Bisherige Medikation</TabsTrigger>
+            {/* Untersuchungen */}
             <TabsTrigger value="physical-examination">Körperliche Untersuchung</TabsTrigger>
-            <TabsTrigger value="ecg-analysis">EKG-Auswertung</TabsTrigger>
-            <TabsTrigger value="transthoracic-echocardiography">Echo</TabsTrigger>
+            <TabsTrigger value="ecg-analysis">12-Kanal-Ruhe-EKG / Rhythmusstreifen</TabsTrigger>
+            <TabsTrigger value="transthoracic-echocardiography">Transthorakale Echokardiographie</TabsTrigger>
             <TabsTrigger value="ergometry">Ergometrie</TabsTrigger>
-            <TabsTrigger value="lz-ekg">LZ-EKG</TabsTrigger>
+            <TabsTrigger value="lz-ekg">6d- / 24-h-LZ-EKG</TabsTrigger>
             <TabsTrigger value="ct-koronarangiographie">CT-Koronarangiographie</TabsTrigger>
-            <TabsTrigger value="word-export">Word-Export</TabsTrigger>
           </TabsList>
           
           <div className="space-y-4">

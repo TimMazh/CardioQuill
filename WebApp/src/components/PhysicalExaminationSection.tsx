@@ -172,18 +172,20 @@ export function PhysicalExaminationSection({
             <CardTitle>Körpermasse und Blutdruck</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Label htmlFor="height">Körpergrösse (cm):</Label>
+            <Label htmlFor="height">Körpergrösse:</Label>
             <Input 
               id="height" 
               value={height} 
               onChange={(e) => setHeight(e.target.value)} 
+              placeholder="cm"
             />
             <div className="space-y-4">
-              <Label htmlFor="weight">Körpergewicht (kg):</Label>
+              <Label htmlFor="weight">Körpergewicht:</Label>
               <Input 
                 id="weight" 
                 value={weight} 
                 onChange={(e) => setWeight(e.target.value)} 
+                placeholder="kg"
               />
             </div>
             <div className="space-y-4">
@@ -233,11 +235,12 @@ export function PhysicalExaminationSection({
               </RadioGroup>
             </div>
             <div className="space-y-4">
-              <Label htmlFor="pulse">Ruhepuls (min):</Label>
+              <Label>Ruhepuls:</Label>
               <Input 
                 id="pulse" 
                 value={pulse} 
                 onChange={(e) => setPulse(e.target.value)} 
+                placeholder="/min"
               />
             </div>
           </CardContent>
