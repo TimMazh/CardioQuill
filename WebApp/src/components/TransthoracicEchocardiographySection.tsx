@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TextField from "@mui/material/TextField";
 
 interface TransthoracicEchocardiographySectionProps {
   doctorsLetter: any;
@@ -12,6 +13,9 @@ interface TransthoracicEchocardiographySectionProps {
 }
 
 export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoctorsLetter }: TransthoracicEchocardiographySectionProps) {
+  // Ergänzungen
+  const [transthoracicEchocardiographyAdditions, setTransthoracicEchocardiographyAdditions] = useState(doctorsLetter.transthoracicEchocardiographyAdditions || "");
+
   // State for all fields
   const [isLvNormal, setIsLvNormal] = useState(
     typeof doctorsLetter.isLvNormal === "boolean" ? doctorsLetter.isLvNormal : true
@@ -19,7 +23,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
   const [lvText, setLvText] = useState(doctorsLetter.lvText || "");
   const [ivsd, setIVSd] = useState(doctorsLetter.ivsd || "");
   const [lvedd, setLVEDd] = useState(doctorsLetter.lvedd || "");
-  const [lvpwd, setLVPWd] = useState(doctorsLetter.lvpwd || "");  
+  const [lvpwd, setLVPWd] = useState(doctorsLetter.lvpwd || "");
   const [lvMassIndex, setLVMassIndex] = useState(doctorsLetter.lvMassIndex || "");
   const [rwt, setRWT] = useState(doctorsLetter.rwt || "");
   const [isLvSysNormal, setIsLvSysNormal] = useState(
@@ -65,7 +69,6 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
   const [pericardEffusionText, setPericardEffusionText] = useState(doctorsLetter.pericardEffusionText || "");
   const [hasPleuralEffusion, setHasPleuralEffusion] = useState(doctorsLetter.hasPleuralEffusion || false);
   const [pleuralEffusionText, setPleuralEffusionText] = useState(doctorsLetter.pleuralEffusionText || "");
-
 
   const [outputText, setOutputText] = useState("");
 
@@ -113,7 +116,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
     hasPericardEffusion,
     pericardEffusionText,
     hasPleuralEffusion,
-    pleuralEffusionText
+    pleuralEffusionText,
+    transthoracicEchocardiographyAdditions
   ]);
 
   const updateECGAnalysisText = () => {
@@ -161,6 +165,9 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       `${atriaTextOut}. LAVI ${lavi} ml/m2, RAVI ${ravi} ml/m2. ${relaxationTextOut}. E/E' ${ee}. ` +
       `${mitralValveOut} ${tricuspidValveOut} ${pulmonalValveOut} ${aorticValveOut} ` +
       `${pulmPressureOut}. ${pericardEffusionOut}. ${pleuralEffusionOut}. Vmax ${vmax} m/s, DP max ${dpMax} mmHg, DP mean ${dpMean} mmHg.`;
+    if (transthoracicEchocardiographyAdditions.trim()) {
+      text += `\nErgänzungen: ${transthoracicEchocardiographyAdditions.trim()}`;
+    }
     setOutputText(text);
 
     updateDoctorsLetter({
@@ -206,7 +213,8 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
       pericardEffusionText,
       hasPleuralEffusion,
       pleuralEffusionText,
-      transthoracicEchocardiography: text
+      transthoracicEchocardiography: text,
+      transthoracicEchocardiographyAdditions,
     })
   };
   return (
@@ -622,6 +630,15 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
         <div className="bg-background p-4 rounded-md border">
           <h3 className="text-lg font-medium mb-4">Transthorakale Echokardiographie Text</h3>
           <Textarea className="min-h-[150px]" value={doctorsLetter.transthoracicEchocardiography || ""} readOnly />
+          <TextField
+            label="Ergänzungen"
+            multiline
+            minRows={2}
+            fullWidth
+            value={transthoracicEchocardiographyAdditions}
+            onChange={e => setTransthoracicEchocardiographyAdditions(e.target.value)}
+            margin="normal"
+          />
         </div>
       </CardContent>
     </Card>

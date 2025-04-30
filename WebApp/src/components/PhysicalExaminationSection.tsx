@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DoctorsLetter } from "@/lib/types";
+import TextField from "@mui/material/TextField";
 
 interface PhysicalExaminationSectionProps {
   doctorsLetter: DoctorsLetter;
@@ -43,6 +44,7 @@ export function PhysicalExaminationSection({
   const [hasFlowNoise, setHasFlowNoise] = useState(doctorsLetter.hasFlowNoise || false);
   const [edemaDetails, setEdemaDetails] = useState(doctorsLetter.edemaDetails || "");
   const [hasEdema, setHasEdema] = useState(doctorsLetter.hasEdema || false);
+  const [physicalExaminationAdditions, setPhysicalExaminationAdditions] = useState(doctorsLetter.physicalExaminationAdditions || "");
 
   // Update examination text when any input changes
   useEffect(() => {
@@ -51,7 +53,7 @@ export function PhysicalExaminationSection({
     az, ez, height, weight, bmi, bpLeftSys, bpLeftDia, bpRightSys, bpRightDia,
     hasBPSideDifference, pulse, heartRhythm, heartRhythmDetails, hasHeartPathology, heartPathology,
     hasLungAbnormality, lungDetails, pulseStatus, flowNoiseDetails,
-    hasEdema, edemaDetails, hasGoodPulse, hasFlowNoise
+    hasEdema, edemaDetails, hasGoodPulse, hasFlowNoise, physicalExaminationAdditions
   ]);
 
   // Generate the examination text
@@ -127,6 +129,10 @@ export function PhysicalExaminationSection({
       examinationText += `Keine peripheren Ödeme. Kardinal kompensiert.`;
     }
     
+    if (physicalExaminationAdditions.trim()) {
+      examinationText += `\nErgänzungen: ${physicalExaminationAdditions.trim()}`;
+    }
+    
     // Update the doctors letter
     updateDoctorsLetter({
       physicalExamination: examinationText,
@@ -153,6 +159,7 @@ export function PhysicalExaminationSection({
       edemaDetails,
       hasFlowNoise,
       flowNoiseDetails,
+      physicalExaminationAdditions,
     });
   };
 
@@ -445,6 +452,17 @@ export function PhysicalExaminationSection({
             className="min-h-[150px]" 
             readOnly 
             value={doctorsLetter.physicalExamination || ""}
+          />
+          <TextField
+            label="Ergänzungen"
+            multiline
+            minRows={2}
+            fullWidth
+            value={physicalExaminationAdditions}
+            onChange={e => {
+              setPhysicalExaminationAdditions(e.target.value);
+            }}
+            margin="normal"
           />
         </CardContent>
       </Card>

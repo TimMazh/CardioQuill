@@ -115,7 +115,7 @@ def start_server(ssh_client):
         while elapsed < timeout:
             check_ready_cmd = f"apptainer exec instance://{instanceName} nc -z localhost 5000 && echo 'ready' || echo 'not ready'"
             ready_status, _ = run_ssh_command(ssh_client, check_ready_cmd)
-            if "ready" == ready_status:
+            if ("ready" in ready_status) & ("not ready" not in ready_status):
                 return True
                 
             time.sleep(poll_interval)

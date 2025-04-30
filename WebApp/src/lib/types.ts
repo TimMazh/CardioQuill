@@ -5,6 +5,7 @@ export interface DoctorsLetter {
   
   // Intro Section
   greeting?: string;
+  introSectionAdditions?: string;
   
   // Master Data
   patientFirstName?: string;
@@ -31,9 +32,13 @@ export interface DoctorsLetter {
   anamnesis?: string;
   previousMedication?: string;
   physicalExamination?: string;
+  physicalExaminationAdditions?: string;
   ecgAnalysis?: string;
+  ecgAnalysisAdditions?: string;
   transthoracicEchocardiography?: string;
+  transthoracicEchocardiographyAdditions?: string;
   ergometry?: string;
+  ergometryAdditions?: string;
 
   mode?: string;
   

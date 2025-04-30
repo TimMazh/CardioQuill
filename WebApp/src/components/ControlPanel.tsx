@@ -14,6 +14,8 @@ interface ControlPanelProps {
   onToggleRAG: () => void;
   appStatus: string;
   serverStatus: ServerStatus;
+  onWordExport: () => void;
+  isExporting: boolean;
 }
 
 export function ControlPanel({
@@ -23,7 +25,9 @@ export function ControlPanel({
   ragEnabled,
   onToggleRAG,
   appStatus,
-  serverStatus
+  serverStatus,
+  onWordExport,
+  isExporting
 }: ControlPanelProps) {
   return (
     <div className="border-t border-border mt-4 pt-4 mb-4">
@@ -46,6 +50,9 @@ export function ControlPanel({
             variant={ragEnabled ? "default" : "secondary"}
           >
             RAG {ragEnabled ? "aktiviert" : "deaktiviert"}
+          </Button>
+          <Button onClick={onWordExport} disabled={isExporting}>
+            {isExporting ? "Export läuft..." : "Word generieren"}
           </Button>
           <Button onClick={onClearFields} variant="outline">
             Alle Felder leeren

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -6,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DoctorsLetter } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import TextField from "@mui/material/TextField";
 
 interface IntroSectionProps {
   doctorsLetter: DoctorsLetter;
@@ -15,75 +15,103 @@ interface IntroSectionProps {
 export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectionProps) {
   const [greeting, setGreeting] = useState(doctorsLetter.greeting || "Sehr geehrte");
   const [mode, setMode] = useState(doctorsLetter.mode || 'regulaer');
+  const [introSectionAdditions, setIntroSectionAdditions] = useState(doctorsLetter.introSectionAdditions || "");
 
-  // Update intro text when greeting or mode changes or relevant patient/doctor data changes
-  useEffect(() => {
-    updateIntroText();
-  }, [
-    greeting, 
+  // Hilfsfunktion: Baut den Einleitungstext aus Parametern
+  function buildIntroText({
+    greeting,
     mode,
-    doctorsLetter.patientLastName, 
-    doctorsLetter.patientGender, 
-    doctorsLetter.patientDateOfBirth,
-    doctorsLetter.doctorTitle,
-    doctorsLetter.doctorGender,
-    doctorsLetter.doctorFirstName,
-    doctorsLetter.doctorLastName,
-    doctorsLetter.patientControlDate
-  ]);
-
-  const updateIntroText = () => {
-    const {
-      patientLastName = "Patientnachname",
-      patientGender = "",
-      patientDateOfBirth = "",
-      doctorTitle = "",
-      doctorGender = "",
-      doctorLastName = "Arztnachname",
-      doctorFirstName = "Arztvorname",
-      patientControlDate = "dem heutigen Datum",
-    } = doctorsLetter;
-
-    // Gender-based text
+    introSectionAdditions,
+    patientLastName = "Patientnachname",
+    patientGender = "",
+    patientDateOfBirth = "",
+    doctorTitle = "",
+    doctorGender = "",
+    doctorLastName = "Arztnachname",
+    doctorFirstName = "Arztvorname",
+    patientControlDate = "dem heutigen Datum"
+  }: {
+    greeting: string;
+    mode: string;
+    introSectionAdditions: string;
+    patientLastName?: string;
+    patientGender?: string;
+    patientDateOfBirth?: string;
+    doctorTitle?: string;
+    doctorGender?: string;
+    doctorLastName?: string;
+    doctorFirstName?: string;
+    patientControlDate?: string;
+  }): string {
     const patientPronoun = patientGender === "female" ? "Frau" : "Herr";
-    const commonPatient = patientGender === "female" 
-      ? "unserer gemeinsamen Patientin" 
+    const commonPatient = patientGender === "female"
+      ? "unserer gemeinsamen Patientin"
       : "unseres gemeinsamen Patienten";
     const patientArticle = patientGender === "female" ? "die" : "der";
-
     const doctorPronoun = doctorGender === "female" ? "Frau" : "Herr";
-
-    // Greeting format
     let formattedGreeting: string = greeting;
     if (greeting === "Sehr geehrte" && doctorGender !== "female") {
       formattedGreeting = "Sehr geehrter";
     } else if (greeting === "Liebe" && doctorGender !== "female") {
       formattedGreeting = "Lieber";
     }
-
-    // Doctor form of address
-    const doctorAddress = greeting === "Liebe" 
-      ? doctorFirstName.split(' ')[0] // First name for informal
+    const doctorAddress = greeting === "Liebe"
+      ? doctorFirstName.split(' ')[0]
       : `${doctorPronoun}${doctorTitle ? ' ' + doctorTitle : ''} ${doctorLastName}`;
-
-    // Generate the text
     let modeText = '';
     if (mode === 'regulaer') {
       modeText = `Gerne berichte ich über die reguläre kardiologische Verlaufskontrolle`;
     } else {
       modeText = `Gerne berichte ich über die notfallmässige Vorstellung`;
     }
-    
-    const introText = 
-      `${formattedGreeting} ${doctorAddress}\n\n` +
+    return `${formattedGreeting} ${doctorAddress}\n\n` +
       `${modeText} ${commonPatient} ` +
-      `${patientPronoun} ${patientLastName}, ${patientArticle} sich am ${formatDate(patientControlDate)} in meiner Praxis vorgestellt hatte.\n`;
+      `${patientPronoun} ${patientLastName}, ${patientArticle} sich am ${formatDate(patientControlDate)} in meiner Praxis vorgestellt hatte.\n` +
+      (introSectionAdditions.trim() ? `\nErgänzungen: ${introSectionAdditions.trim()}` : "");
+  }
 
-    updateDoctorsLetter({ introText, greeting, mode });
+
+  const handleAdditionsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setIntroSectionAdditions(value);
+    updateDoctorsLetter({
+      ...doctorsLetter,
+      introSectionAdditions: value,
+      introText: buildIntroText({
+        greeting,
+        mode,
+        introSectionAdditions: value,
+        patientLastName: doctorsLetter.patientLastName,
+        patientGender: doctorsLetter.patientGender,
+        patientDateOfBirth: doctorsLetter.patientDateOfBirth,
+        doctorTitle: doctorsLetter.doctorTitle,
+        doctorGender: doctorsLetter.doctorGender,
+        doctorLastName: doctorsLetter.doctorLastName,
+        doctorFirstName: doctorsLetter.doctorFirstName,
+        patientControlDate: doctorsLetter.patientControlDate,
+      })
+    });
   };
 
   const handleGreetingChange = (value: "Liebe" | "Sehr geehrte") => {
     setGreeting(value);
+    updateDoctorsLetter({
+      ...doctorsLetter,
+      greeting: value,
+      introText: buildIntroText({
+        greeting: value,
+        mode,
+        introSectionAdditions,
+        patientLastName: doctorsLetter.patientLastName,
+        patientGender: doctorsLetter.patientGender,
+        patientDateOfBirth: doctorsLetter.patientDateOfBirth,
+        doctorTitle: doctorsLetter.doctorTitle,
+        doctorGender: doctorsLetter.doctorGender,
+        doctorLastName: doctorsLetter.doctorLastName,
+        doctorFirstName: doctorsLetter.doctorFirstName,
+        patientControlDate: doctorsLetter.patientControlDate,
+      })
+    });
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -121,7 +149,26 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
         <CardContent>
           <RadioGroup
             value={mode}
-            onValueChange={(value) => setMode(value as 'regulaer' | 'notfall')}
+            onValueChange={(value) => {
+              setMode(value as 'regulaer' | 'notfall');
+              updateDoctorsLetter({
+                ...doctorsLetter,
+                mode: value as 'regulaer' | 'notfall',
+                introText: buildIntroText({
+                  greeting,
+                  mode: value,
+                  introSectionAdditions,
+                  patientLastName: doctorsLetter.patientLastName,
+                  patientGender: doctorsLetter.patientGender,
+                  patientDateOfBirth: doctorsLetter.patientDateOfBirth,
+                  doctorTitle: doctorsLetter.doctorTitle,
+                  doctorGender: doctorsLetter.doctorGender,
+                  doctorLastName: doctorsLetter.doctorLastName,
+                  doctorFirstName: doctorsLetter.doctorFirstName,
+                  patientControlDate: doctorsLetter.patientControlDate,
+                })
+              });
+            }}
             className="flex space-x-4"
           >
             <div className="flex items-center space-x-2">
@@ -146,6 +193,15 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
             placeholder="Hier erscheint der generierte Einleitungstext..."
             readOnly
             value={doctorsLetter.introText}
+          />
+          <TextField
+            label="Ergänzungen"
+            multiline
+            minRows={2}
+            fullWidth
+            value={introSectionAdditions}
+            onChange={handleAdditionsChange}
+            margin="normal"
           />
         </CardContent>
       </Card>

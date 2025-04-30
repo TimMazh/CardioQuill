@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DoctorsLetter } from "@/lib/types";
+import TextField from "@mui/material/TextField";
 
 interface ECGAnalysisSectionProps {
   doctorsLetter: DoctorsLetter;
@@ -44,6 +45,9 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
   
   // Output text
   const [outputText, setOutputText] = useState("");
+
+  // Ergänzungen
+  const [ecgAnalysisAdditions, setECGAnalysisAdditions] = useState(doctorsLetter.ecgAnalysisAdditions || "");
   
   // Update output text on any change
   useEffect(() => {
@@ -52,7 +56,8 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     sinusRate, lagetyp, pq, qrs, qtc, hasPathologicalQ, qWaveLeads, 
     hasSTChanges, stChangesText, hasRegularRProgression, rProgressionText,
     rhythmContinuity, rhythmFrequency, extrasystole, 
-    extrasystoleFrequency, extrasystoleTypes, rhythmContinuityText
+    extrasystoleFrequency, extrasystoleTypes, rhythmContinuityText,
+    ecgAnalysisAdditions
   ]);
   
   // Toggle leads selection for pathological Q
@@ -149,13 +154,16 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     }
 
     // Combine all parts
-    const ecgAnalysisText = [
+    let text = [
       sinus, lage, intervals, qWaveText, stText, 
       rProgressionText2, rhythmStripText, extrasystoleText
     ].filter(Boolean).join(" ");
     
-    setOutputText(ecgAnalysisText);
-    updateDoctorsLetter({ 
+    if (ecgAnalysisAdditions.trim()) {
+      text += `\nErgänzungen: ${ecgAnalysisAdditions.trim()}`;
+    }
+    // Update the doctors letter
+    updateDoctorsLetter({
       sinusRate,
       lagetyp,
       pq,
@@ -173,8 +181,10 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
       extrasystole,
       extrasystoleFrequency,
       extrasystoleTypes,
-      ecgAnalysis: ecgAnalysisText
+      ecgAnalysis: text,
+      ecgAnalysisAdditions,
     });
+    setOutputText(text);
   };
 
   return (
@@ -514,6 +524,15 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
             className="min-h-[150px]" 
             value={doctorsLetter.ecgAnalysis || ""} 
             readOnly 
+          />
+          <TextField
+            label="Ergänzungen"
+            multiline
+            minRows={2}
+            fullWidth
+            value={ecgAnalysisAdditions}
+            onChange={e => setECGAnalysisAdditions(e.target.value)}
+            margin="normal"
           />
         </div>
       </CardContent>
