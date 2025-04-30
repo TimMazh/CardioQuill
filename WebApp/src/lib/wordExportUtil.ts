@@ -1,11 +1,18 @@
 import { DoctorsLetter } from "./types";
-import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Header, Footer, ImageRun, IImageOptions, Table, TableRow, TableCell } from "docx";
 import { formatDate } from "./utils";
 import { fetchLLMSummary } from "./llmSummary";
 
 
 
 
+
+// Helper to load image as ArrayBuffer (browser/node compatible)
+async function loadLogoImage(): Promise<ArrayBuffer> {
+  // Browser fetch for image asset
+  const response = await fetch("/src/lib/logo.png");
+  return await response.arrayBuffer();
+}
 
 export async function generateWordDocument(letter: DoctorsLetter): Promise<Blob> {
   // Hole die LLM-Zusammenfassung
@@ -29,25 +36,108 @@ export async function generateWordDocument(letter: DoctorsLetter): Promise<Blob>
   const patCode = `${(letter.patientLastName || "").substring(0,3).toLowerCase()}${(letter.patientFirstName || "").substring(0,1).toLowerCase()}${monthYear}`;
 
 
+  // Header/Footer color
+  const grayColor = "808080";
+
+  // Header text for subsequent pages
+  const headerText = `${letter.patientLastName || "Patientennachname"} ${letter.patientFirstName || "Patientenvorname"}, ${patientDateOfBirth || "Geburtsdatum"} - Ambulante Kontrolle am ${patientControlDate || "Kontrolldatum"}`;
+  // Footer text
+  const footerText = "Kardiologische Praxis Rosenberg | Rosenbergstrasse 8 | CH - 9000 St. Gallen | info@kardiologische-praxis-rosenberg.ch | www.kardiologische-praxis-rosenberg.ch | Telefon +41 (0)71 245 77 25";
+  // Load logo image for first page header
+  // Always load the PNG logo as ArrayBuffer, convert to Uint8Array for docx
+const logoBuffer = await loadLogoImage();
+const logoUint8Array = new Uint8Array(logoBuffer);
+console.log("[wordExportUtil] LogoBuffer type:", typeof logoBuffer);
+console.log("[wordExportUtil] LogoUint8Array length:", logoUint8Array.length);
+console.log("[wordExportUtil] LogoUint8Array first bytes:", Array.from(logoUint8Array.slice(0, 8)));
+
   const doc = new Document({
     sections: [
       {
-        children: [
-          // Arztadresse oben rechts
-          new Paragraph({
-            alignment: AlignmentType.RIGHT,
+        headers: {
+          default: new Header({
             children: [
-              new TextRun({ text: letter.doctorGender === "female" ? "Frau" : "Herrn" }),
-              new TextRun({ break: 1 }),
-              new TextRun({ text: letter.doctorTitle || "" }),
-              new TextRun({ break: 1 }),
-              new TextRun({ text: `${letter.doctorFirstName || "[Arztname]"} ${letter.doctorLastName || ""}`.trim() }),
-              new TextRun({ break: 1 }),
-              new TextRun({ text: letter.doctorClinic || "[Klinik Name]" }),
-              new TextRun({ break: 1 }),
-              new TextRun({ text: letter.doctorAddress || "[Adresse]" }),
-              new TextRun({ break: 1 })
-            ]
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({
+                    text: headerText,
+                    color: grayColor,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        },
+        footers: {
+          default: new Footer({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({
+                    text: footerText,
+                    color: grayColor,
+                  }),
+                ],
+              }),
+            ],
+          }),
+        },
+        
+        children: [ 
+          // Logo links, Ärzteinformationen rechts in einer Tabelle
+          new Table({
+            borders: {
+              top: { style: "none", size: 0, color: "FFFFFF" },
+              bottom: { style: "none", size: 0, color: "FFFFFF" },
+              left: { style: "none", size: 0, color: "FFFFFF" },
+              right: { style: "none", size: 0, color: "FFFFFF" },
+              insideHorizontal: { style: "none", size: 0, color: "FFFFFF" },
+              insideVertical: { style: "none", size: 0, color: "FFFFFF" },
+            },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.LEFT,
+                        children: [
+                          new ImageRun({
+                            data: logoUint8Array,
+                            transformation: { width: 232, height: 42 },
+                            type: "png"
+                          })
+                        ]
+                      })
+                    ],
+                  }),
+                  new TableCell({
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.RIGHT,
+                        children: [
+                          new TextRun({ text: letter.doctorGender === "female" ? "Frau" : "Herrn" }),
+                          new TextRun({ break: 1 }),
+                          new TextRun({ text: letter.doctorTitle || "" }),
+                          new TextRun({ break: 1 }),
+                          new TextRun({ text: `${letter.doctorFirstName || "[Arztname]"} ${letter.doctorLastName || ""}`.trim() }),
+                          new TextRun({ break: 1 }),
+                          new TextRun({ text: letter.doctorClinic || "[Klinik Name]" }),
+                          new TextRun({ break: 1 }),
+                          new TextRun({ text: letter.doctorAddress || "[Adresse]" }),
+                          new TextRun({ break: 1 })
+                        ]
+                      })
+                    ],
+                    width: { size:0, type: "pct" },
+                  })
+                ]
+              })
+            ],
+            width: { size: 100, type: "pct" },
+            alignment: AlignmentType.LEFT,
           }),
           // Datum und Patientencode rechts
           new Paragraph({
