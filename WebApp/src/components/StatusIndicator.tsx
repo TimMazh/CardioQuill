@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface StatusIndicatorProps {
   label: string;
-  status: ServerStatus | "ready" | "error" | "processing";
+  status: ServerStatus | "ready" | "error" | "processing" | "not-ready" | "checking";
   message?: string;
 }
 
@@ -28,6 +28,14 @@ export function StatusIndicator({ label, status, message }: StatusIndicatorProps
       case "error":
         variant = "destructive";
         text = "Fehler";
+        break;
+      case "not-ready":
+        variant = "destructive";
+        text = "Nicht bereit";
+        break;  
+      case "checking":
+        variant = "outline";
+        text = "Prüfe...";
         break;
       default:
         variant = "outline";

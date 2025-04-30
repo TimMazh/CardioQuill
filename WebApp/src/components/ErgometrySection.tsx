@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DoctorsLetter } from "@/lib/types";
+import TextField from "@mui/material/TextField";
 
 interface ErgometrySectionProps {
   doctorsLetter: DoctorsLetter;
@@ -16,6 +17,9 @@ interface ErgometrySectionProps {
 const stLeads = ["I", "II", "III", "aVF", "aVR", "aVL", "V1", "V2", "V3", "V4", "V5", "V6"];
 
 export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: ErgometrySectionProps) {
+  // Ergänzungen
+  const [ergometryAdditions, setErgometryAdditions] = useState(doctorsLetter.ergometryAdditions || "");
+
   // States
   const [cancellingReason, setCancellingReason] = useState(doctorsLetter.cancellingReason || "Erschöpfung");
   const [shouldWatt, setShouldWatt] = useState(doctorsLetter.shouldWatt || "");
@@ -61,7 +65,8 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
     hasRhythmDisturbance,
     rhythmDisturbanceText,
     hasStChangesErgo,
-    stLeadsErgo
+    stLeadsErgo,
+    ergometryAdditions
   ]);
 
   const toggleStLead = (lead: string) => {
@@ -98,6 +103,9 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
       text += "Keine ischämietypischen ST-Veränderungen. ";
     }
     
+    if (ergometryAdditions.trim()) {
+      text += `\nErgänzungen: ${ergometryAdditions.trim()}`;
+    }
     setOutputText(text);
     updateDoctorsLetter({ 
       cancellingReason,
@@ -116,7 +124,9 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
       hasRhythmDisturbance,
       rhythmDisturbanceText,
       hasStChangesErgo,
-      stLeadsErgo
+      stLeadsErgo,
+      ergometry: text,
+      ergometryAdditions
     });
   };
 
@@ -344,7 +354,16 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
   {/* Generierter Text */}
   <div className="bg-background p-4 rounded-md border">
     <h3 className="text-lg font-medium mb-4">Ergometrie Text</h3>
-    <Textarea className="min-h-[120px]" value={outputText} readOnly />
+    <Textarea className="min-h-[120px]" value={doctorsLetter.ergometry || ""} readOnly />
+    <TextField
+      label="Ergänzungen"
+      multiline
+      minRows={2}
+      fullWidth
+      value={ergometryAdditions}
+      onChange={e => setErgometryAdditions(e.target.value)}
+      margin="normal"
+    />
   </div>
 </CardContent>
 </Card>);

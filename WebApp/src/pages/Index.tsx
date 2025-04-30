@@ -13,6 +13,8 @@ import { DoctorsLetter, ServerStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/mockBackend";
 import { TransthoracicEchocardiographySection } from "@/components/TransthoracicEchocardiographySection";
+import { saveAs } from "file-saver";
+import { generateWordDocument } from "@/lib/wordExportUtil";
 
 const Index = () => {
   const { toast } = useToast();
@@ -21,7 +23,11 @@ const Index = () => {
   const [doctorsLetter, setDoctorsLetter] = useState<DoctorsLetter>(() => {
     // Try to load saved state from sessionStorage
     const savedState = sessionStorage.getItem('doctorsLetterState');
-    return savedState ? JSON.parse(savedState) : {};
+    if (savedState) return JSON.parse(savedState);
+    return {
+      patientDateOfBirth: "",
+      patientControlDate: ""
+    };
   });
   
   // Application state
@@ -51,22 +57,45 @@ const Index = () => {
   // Check server status and start it if needed
   const checkAndStartServer = async () => {
     setServerStatus({ status: "checking" });
+    setAppStatus("checking");
     const status = await checkServerStatus();
     console.log("Server status:", status);
     if (status.status === "not-running") {
       setServerStatus({ status: "starting" });
+      setAppStatus("not-ready");
       const startedStatus = await startServer();
-      setServerStatus(startedStatus);
-      return startedStatus.status === "running";
 
-    }    
+      setServerStatus(startedStatus);
+      // Nach dem Start erneut prüfen, ob der Server wirklich läuft
+      const confirmedStatus = await checkServerStatus();
+      if (confirmedStatus.status === "running") {
+        setAppStatus("ready");
+      }
+      setServerStatus(confirmedStatus);
+      return confirmedStatus.status === "running";
+    }
     setServerStatus(status);
+    setAppStatus("ready");
     return status.status === "running";
   };
 
   useEffect(() => {
     checkAndStartServer();
   }, []); 
+
+  // Word-Export
+  const [isExporting, setIsExporting] = useState(false);
+  const handleWordExport = async () => {
+    setAppStatus("processing");
+    setIsExporting(true);
+    try {
+      const blob = await generateWordDocument(doctorsLetter);
+      saveAs(blob, `Bericht_${doctorsLetter.patientLastName || "Patient"}.docx`);
+    } finally {
+      setAppStatus("ready");
+      setIsExporting(false);
+    }
+  };
 
   // Generate report
   const handleGenerateReport = async () => {
@@ -151,20 +180,22 @@ const Index = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">CardioVista - Medical Scribe</h1>
           <p className="text-muted-foreground">Medizinische Berichte und Kardiologische Analysen</p>
           <ControlPanel 
-          onGenerateReport={handleGenerateReport}
-          onUploadPDF={() => handleUploadPDF()}
-          onClearFields={handleClearFields}
-          ragEnabled={ragEnabled}
-          onToggleRAG={handleToggleRAG}
-          appStatus={appStatus}
-          serverStatus={serverStatus}
-        />
+            onGenerateReport={handleGenerateReport}
+            onUploadPDF={handleUploadPDF}
+            onClearFields={handleClearFields}
+            ragEnabled={ragEnabled}
+            onToggleRAG={handleToggleRAG}
+            appStatus={appStatus}
+            serverStatus={serverStatus}
+            onWordExport={handleWordExport}
+            isExporting={isExporting}
+          />
         
-        <UploadPDFDialog
-          open={pdfDialogOpen}
-          onOpenChange={setPdfDialogOpen}
-          onUpload={handleUploadPDF}
-        />
+          <UploadPDFDialog
+            open={pdfDialogOpen}
+            onOpenChange={setPdfDialogOpen}
+            onUpload={handleUploadPDF}
+          />
         </header>
         
         
@@ -184,6 +215,7 @@ const Index = () => {
             <TabsTrigger value="ergometry">Ergometrie</TabsTrigger>
             <TabsTrigger value="lz-ekg">LZ-EKG</TabsTrigger>
             <TabsTrigger value="ct-koronarangiographie">CT-Koronarangiographie</TabsTrigger>
+            <TabsTrigger value="word-export">Word-Export</TabsTrigger>
           </TabsList>
           
           <div className="space-y-4">
@@ -307,6 +339,7 @@ const Index = () => {
                 placeholder="CT-Koronarangiographie-Befund eintragen..."
               />
             </TabsContent>
+
           </div>
         </Tabs>
         
@@ -319,6 +352,7 @@ const Index = () => {
             setAppStatus(isProcessing ? "processing" : "ready");
           }}
         />
+
         
       </div>
     </div>

@@ -170,7 +170,10 @@ export class ServerService {
         },
         "Error executing prompt"
       );
-      
+      console.log(data);
+      console.log(data.response);
+      console.log(data.message);
+      console.log(data.success);
       if (!data.success) {
         throw new Error(data.message || 'Unknown error');
       }
