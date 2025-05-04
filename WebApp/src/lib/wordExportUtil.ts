@@ -54,7 +54,24 @@ console.log("[wordExportUtil] LogoUint8Array first bytes:", Array.from(logoUint8
   const doc = new Document({
     sections: [
       {
+        properties: {
+          titlePage: true
+        },
         headers: {
+          first: new Header({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.LEFT,
+                children: [
+                  new ImageRun({
+                    data: logoUint8Array,
+                    transformation: { width: 232, height: 42 },
+                    type: "png"
+                  })
+                ],
+              }),
+            ],
+          }),
           default: new Header({
             children: [
               new Paragraph({
@@ -70,6 +87,19 @@ console.log("[wordExportUtil] LogoUint8Array first bytes:", Array.from(logoUint8
           }),
         },
         footers: {
+          first: new Footer({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({
+                    text: footerText,
+                    color: grayColor,
+                  }),
+                ],
+              }),
+            ],
+          }),
           default: new Footer({
             children: [
               new Paragraph({
@@ -87,58 +117,21 @@ console.log("[wordExportUtil] LogoUint8Array first bytes:", Array.from(logoUint8
         
         children: [ 
           // Logo links, Ärzteinformationen rechts in einer Tabelle
-          new Table({
-            borders: {
-              top: { style: "none", size: 0, color: "FFFFFF" },
-              bottom: { style: "none", size: 0, color: "FFFFFF" },
-              left: { style: "none", size: 0, color: "FFFFFF" },
-              right: { style: "none", size: 0, color: "FFFFFF" },
-              insideHorizontal: { style: "none", size: 0, color: "FFFFFF" },
-              insideVertical: { style: "none", size: 0, color: "FFFFFF" },
-            },
-            rows: [
-              new TableRow({
-                children: [
-                  new TableCell({
-                    children: [
-                      new Paragraph({
-                        alignment: AlignmentType.LEFT,
-                        children: [
-                          new ImageRun({
-                            data: logoUint8Array,
-                            transformation: { width: 232, height: 42 },
-                            type: "png"
-                          })
-                        ]
-                      })
-                    ],
-                  }),
-                  new TableCell({
-                    children: [
-                      new Paragraph({
-                        alignment: AlignmentType.RIGHT,
-                        children: [
-                          new TextRun({ text: letter.doctorGender === "female" ? "Frau" : "Herrn" }),
-                          new TextRun({ break: 1 }),
-                          new TextRun({ text: letter.doctorTitle || "" }),
-                          new TextRun({ break: 1 }),
-                          new TextRun({ text: `${letter.doctorFirstName || "[Arztname]"} ${letter.doctorLastName || ""}`.trim() }),
-                          new TextRun({ break: 1 }),
-                          new TextRun({ text: letter.doctorClinic || "[Klinik Name]" }),
-                          new TextRun({ break: 1 }),
-                          new TextRun({ text: letter.doctorAddress || "[Adresse]" }),
-                          new TextRun({ break: 1 })
-                        ]
-                      })
-                    ],
-                    width: { size:0, type: "pct" },
-                  })
-                ]
-              })
-            ],
-            width: { size: 100, type: "pct" },
-            alignment: AlignmentType.LEFT,
-          }),
+          new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [
+                new TextRun({ text: letter.doctorGender === "female" ? "Frau" : "Herrn" }),
+                new TextRun({ break: 1 }),
+                new TextRun({ text: letter.doctorTitle || "" }),
+                new TextRun({ break: 1 }),
+                new TextRun({ text: `${letter.doctorFirstName || "[Arztname]"} ${letter.doctorLastName || ""}`.trim() }),
+                new TextRun({ break: 1 }),
+                new TextRun({ text: letter.doctorClinic || "[Klinik Name]" }),
+                new TextRun({ break: 1 }),
+                new TextRun({ text: letter.doctorAddress || "[Adresse]" }),
+                new TextRun({ break: 1 })
+              ]
+            }),
           // Datum und Patientencode rechts
           new Paragraph({
             alignment: AlignmentType.RIGHT,
