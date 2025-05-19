@@ -107,17 +107,23 @@ export function QueryPanel({ ragEnabled, onProcessingChange }: QueryPanelProps) 
         }
       }
       
-      const result = await serverService.executePrompt(query, ragEnabled);
+      const result = await serverService.executePrompt("_LOCAL_LLM_QUERY_" + query, ragEnabled);
       
-      if (typeof result === 'string') {
+      setResponse(result);
+      setIsProcessing(false);
+      onProcessingChange(false);
+
+     /* if (typeof result === 'string') {
         setResponse(result.startsWith("Fehler:") ? result : "Anfrage wird vom Modell verarbeitet, bitte warten...");
         startPolling(currentQueryId);
-      }
+      }*/
     } catch (error) {
       console.error("Failed to execute query:", error);
       
       const errorMessage = error instanceof Error ? error.message : String(error);
       setResponse(`Verbindungsfehler: ${errorMessage}`);
+      setIsProcessing(false);
+      onProcessingChange(false);
       
       toast({
         title: "Verbindungsfehler",
@@ -125,21 +131,20 @@ export function QueryPanel({ ragEnabled, onProcessingChange }: QueryPanelProps) 
         variant: "destructive",
       });
       
-      setIsProcessing(false);
-      onProcessingChange(false);
+      
     }
   };
 
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>LLM Abfrage {ragEnabled ? "(RAG aktiviert)" : ""}</CardTitle>
+        <CardTitle>CardioQuill Abfrage</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="grid gap-2">
             <Textarea
-              placeholder="Stellen Sie eine Frage an das Sprachmodell..."
+              placeholder="Stellen Sie CardioQuill eine Frage..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="min-h-[100px]"

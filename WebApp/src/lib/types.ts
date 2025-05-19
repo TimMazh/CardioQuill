@@ -1,5 +1,5 @@
 
-// Type definitions for the CardioVista application
+// Type definitions for the CardioQuill application
 
 export interface DoctorsLetter {
   

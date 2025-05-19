@@ -40,7 +40,7 @@ export function ControlPanel({
           <UploadPDFDialog 
             onUpload={onUploadPDF}
             trigger={
-              <Button variant="secondary">
+              <Button variant="outline">
                 <FileUp className="mr-2 h-4 w-4" />
                 PDF hochladen
               </Button>
@@ -48,9 +48,10 @@ export function ControlPanel({
           />
           <Button 
             onClick={onToggleRAG} 
-            variant={ragEnabled ? "default" : "secondary"}
+            variant={ragEnabled ? "default" : "outline"}
+            
           >
-            RAG {ragEnabled ? "aktiviert" : "deaktiviert"}
+            Beispielverwendung {ragEnabled ? "aktiviert" : "deaktiviert"}
           </Button>
           
         </div>

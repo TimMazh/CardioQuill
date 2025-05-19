@@ -141,7 +141,7 @@ def execute_prompt(ssh_client, query, use_rag=False):
  
     # Normales Verhalten (inkl. persistentem RAG)
     escaped_query = query.replace("'", "'\\''")
-    if use_rag:
+    if use_rag and "_LOCAL_LLM_QUERY_" not in query:
         escaped_query = "_USE_RAG_ " + escaped_query
     
     cache_key = generate_cache_key(query)

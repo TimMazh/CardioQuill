@@ -1,7 +1,7 @@
 
-# CardioVista Python Backend
+# CardioQuill Python Backend
 
-This is the Python backend for the CardioVista application. It handles connections to the remote SSH server and manages the LLM interactions.
+This is the Python backend for the CardioQuill application. It handles connections to the remote SSH server and manages the LLM interactions.
 
 ## Setup
 
