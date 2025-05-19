@@ -29,7 +29,7 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
     doctorGender = "",
     doctorLastName = "Arztnachname",
     doctorFirstName = "Arztvorname",
-    patientControlDate = "dem heutigen Datum"
+    patientControlDate = ""
   }: {
     greeting: string;
     mode: string;
@@ -43,10 +43,10 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
     doctorFirstName?: string;
     patientControlDate?: string;
   }): string {
-    const patientPronoun = patientGender === "female" ? "Frau" : "Herr";
+    const patientPronoun = patientGender === "female" ? "Frau" : "Herrn";
     const commonPatient = patientGender === "female"
-      ? "unserer gemeinsamen Patientin"
-      : "unseres gemeinsamen Patienten";
+      ? "unserer gemeinsamen Patientin,"
+      : "unseres gemeinsamen Patienten,";
     const patientArticle = patientGender === "female" ? "die" : "der";
     const doctorPronoun = doctorGender === "female" ? "Frau" : "Herr";
     let formattedGreeting: string = greeting;
@@ -64,12 +64,31 @@ export function IntroSection({ doctorsLetter, updateDoctorsLetter }: IntroSectio
     } else {
       modeText = `Gerne berichte ich über die notfallmässige Vorstellung`;
     }
+
     return `${formattedGreeting} ${doctorAddress}\n\n` +
       `${modeText} ${commonPatient} ` +
       `${patientPronoun} ${patientLastName}, ${patientArticle} sich am ${formatDate(patientControlDate)} in meiner Praxis vorgestellt hatte.\n` +
       (introSectionAdditions.trim() ? `\nErgänzungen: ${introSectionAdditions.trim()}` : "");
   }
 
+  useEffect(() => {
+    updateDoctorsLetter({
+      ...doctorsLetter,
+      introText: buildIntroText({
+        greeting,
+        mode,
+        introSectionAdditions,
+        patientLastName: doctorsLetter.patientLastName,
+        patientGender: doctorsLetter.patientGender,
+        patientDateOfBirth: doctorsLetter.patientDateOfBirth,
+        doctorTitle: doctorsLetter.doctorTitle,
+        doctorGender: doctorsLetter.doctorGender,
+        doctorLastName: doctorsLetter.doctorLastName,
+        doctorFirstName: doctorsLetter.doctorFirstName,
+        patientControlDate: doctorsLetter.patientControlDate,
+      })
+    });
+  }, [greeting, mode, introSectionAdditions]);
 
   const handleAdditionsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value;

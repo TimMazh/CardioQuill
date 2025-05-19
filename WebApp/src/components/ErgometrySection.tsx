@@ -14,8 +14,6 @@ interface ErgometrySectionProps {
   updateDoctorsLetter: (data: Partial<DoctorsLetter>) => void;
 }
 
-const stLeads = ["I", "II", "III", "aVF", "aVR", "aVL", "V1", "V2", "V3", "V4", "V5", "V6"];
-
 export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: ErgometrySectionProps) {
   // Ergänzungen
   const [ergometryAdditions, setErgometryAdditions] = useState(doctorsLetter.ergometryAdditions || "");
@@ -78,12 +76,16 @@ export function ErgometrySection({ doctorsLetter, updateDoctorsLetter }: Ergomet
   };
 
   const updateErgometryText = () => {
-    const sortedLeads = stLeadsErgo.sort((a, b) => {
-      const leadOrder = ["I", "II", "III", "aVF", "aVR", "aVL", "V1", "V2", "V3", "V4", "V5", "V6"];
-      return leadOrder.indexOf(a) - leadOrder.indexOf(b);
-    });
     let text = "Belastung nach Stufenprotokoll beginnend mit 50 W dann inkrementell mit 25 W alle 2 Minuten. Abbruch der Untersuchung wegen peripherer muskulärer " + cancellingReason + ". ";
-    text += `Insgesamt wurden ${shouldWatt ? shouldWatt : ""}% der Soll-Wattzahl und ${shouldHF ? shouldHF : ""}% der Soll-Herzfrequenz erreicht. `;
+    
+    if (shouldWatt !== "" && shouldHF !== "") {
+      text += "Insgesamt wurden " + shouldWatt + "% der Soll-Wattzahl und " + shouldHF + "% der Soll-Herzfrequenz erreicht. ";
+    } else if (shouldWatt !== "") {
+      text += "Insgesamt wurden " + shouldWatt + "% der Soll-Wattzahl erreicht. ";
+    } else if (shouldHF !== "") {
+      text += "Insgesamt wurden " + shouldHF + "% der Soll-Herzfrequenz erreicht. ";
+    }
+
     text += isBdRegular ? "Regelrechte BD-Regulation. " : bdText ? bdText + ". " : "";
     text += isHfRegular ? "Regelrechte HF-Regulation. " : hfText ? hfText + ". " : "";
     text += hasPektanginoesComplaints ? `Pektanginöse Beschwerden ab ${pektanginoesComplaintsWatt} Watt. ` : "Keine pektanginösen Beschwerden. ";
