@@ -240,7 +240,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Transthoracic Echocardiography</CardTitle>
+        <CardTitle>Transthorakale Echokardiographie</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Linker und Rechter Ventrikel nebeneinander */}

@@ -274,11 +274,11 @@ const Index = () => {
             
             <TabsContent value="recommended-procedure">
               <TextSection 
-                title="Empfohlene Massnahmen" 
+                title="Empfohlenes Procedere" 
                 field="recommendedProcedure" 
                 doctorsLetter={doctorsLetter} 
                 updateDoctorsLetter={updateDoctorsLetter} 
-                placeholder="Empfohlene Massnahmen beschreiben..." 
+                placeholder="Empfohlenes Procedere beschreiben..." 
               />
             </TabsContent>
             
@@ -294,11 +294,11 @@ const Index = () => {
             
             <TabsContent value="previous-medication">
               <TextSection 
-                title="Vormedikation" 
+                title="Bisherige Medikation" 
                 field="previousMedication" 
                 doctorsLetter={doctorsLetter} 
                 updateDoctorsLetter={updateDoctorsLetter} 
-                placeholder="Vormedikation auflisten..." 
+                placeholder="Bisherige Medikation auflisten..." 
               />
             </TabsContent>
             
@@ -331,11 +331,11 @@ const Index = () => {
             </TabsContent>
             <TabsContent value="lz-ekg">
               <TextSection
-                title="LZ-EKG"
+                title="6d- / 24-h-LZ-EKG"
                 field="lzEkg"
                 doctorsLetter={doctorsLetter}
                 updateDoctorsLetter={updateDoctorsLetter}
-                placeholder="LZ-EKG-Befund eintragen..."
+                placeholder="6d- / 24-h-LZ-EKG-Befund eintragen..."
               />
             </TabsContent>
 
