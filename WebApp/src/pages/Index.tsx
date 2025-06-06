@@ -11,7 +11,7 @@ import { UploadPDFDialog } from "@/components/UploadPDFDialog";
 import { QueryPanel } from "@/components/QueryPanel";
 import { DoctorsLetter, ServerStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/mockBackend";
+import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/serverApiClient";
 import { TransthoracicEchocardiographySection } from "@/components/TransthoracicEchocardiographySection";
 import { saveAs } from "file-saver";
 import { generateWordDocument } from "@/lib/wordExportUtil";
