@@ -58,9 +58,6 @@ def execute_prompt(ssh_conn, query):
     """
     # Escape einfache Anführungszeichen in der Query
     escaped_query = query.replace("'", "'\\''")
-    if "_USE_RAG_" in escaped_query:
-        print("TESTTESTTESTTEST")
-
         
     # Sende die Anfrage an den LLM-Server – führe den netcat-Befehl innerhalb der Instanz aus
     cmd = f"APPTAINERENV_CUDA_VISIBLE_DEVICES={GPUs} apptainer exec instance://{instance_name} bash -c \"echo '{escaped_query}' | nc localhost 5000\""

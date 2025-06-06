@@ -11,10 +11,11 @@ import { UploadPDFDialog } from "@/components/UploadPDFDialog";
 import { QueryPanel } from "@/components/QueryPanel";
 import { DoctorsLetter, ServerStatus } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/mockBackend";
+import { checkServerStatus, startServer, uploadAndProcessPdf } from "@/api/serverApiClient";
 import { TransthoracicEchocardiographySection } from "@/components/TransthoracicEchocardiographySection";
 import { saveAs } from "file-saver";
 import { generateWordDocument } from "@/lib/wordExportUtil";
+import CardioQuillLogo from "@/lib/CardioQuillLogo.png";
 
 const Index = () => {
   const { toast } = useToast();
@@ -35,7 +36,7 @@ const Index = () => {
   const [serverStatus, setServerStatus] = useState<ServerStatus>({
     status: "checking",
   });
-  const [ragEnabled, setRagEnabled] = useState(false);
+  const [ragEnabled, setRagEnabled] = useState(true);
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
 
   // Update doctors letter data
@@ -168,8 +169,8 @@ const Index = () => {
   const handleToggleRAG = () => {
     setRagEnabled(!ragEnabled);
     toast({
-      title: `RAG ${!ragEnabled ? "aktiviert" : "deaktiviert"}`,
-      description: `Die RAG-Funktionalität wurde ${!ragEnabled ? "aktiviert" : "deaktiviert"}.`,
+      title: `Beispielverwendung ${!ragEnabled ? "aktiviert" : "deaktiviert"}`,
+      description: `${!ragEnabled ? "Es werden Beispiele von Zusammenfassungen als Inspiration für das Generieren verwendet" : "Es werden keine Beispiele von Zusammenfassungen als Inspiration für das Generieren verwendet"}.`,
     });
   };
 
@@ -177,8 +178,15 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <div className="container max-w-7xl mx-auto py-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">CardioVista - Medical Scribe</h1>
-          <p className="text-muted-foreground">Medizinische Berichte und Kardiologische Analysen</p>
+
+          
+          
+
+          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-4">
+            <img src={CardioQuillLogo} alt="CardioQuill Logo" className="w-24 h-auto mb-0" />
+            CardioQuill
+          </h1>
+          <p className="text-muted-foreground">Kardiologische Berichterstattung</p>
           <ControlPanel 
             onUploadPDF={handleUploadPDF}
             onClearFields={handleClearFields}
@@ -266,11 +274,11 @@ const Index = () => {
             
             <TabsContent value="recommended-procedure">
               <TextSection 
-                title="Empfohlene Massnahmen" 
+                title="Empfohlenes Procedere" 
                 field="recommendedProcedure" 
                 doctorsLetter={doctorsLetter} 
                 updateDoctorsLetter={updateDoctorsLetter} 
-                placeholder="Empfohlene Massnahmen beschreiben..." 
+                placeholder="Empfohlenes Procedere beschreiben..." 
               />
             </TabsContent>
             
@@ -286,11 +294,11 @@ const Index = () => {
             
             <TabsContent value="previous-medication">
               <TextSection 
-                title="Vormedikation" 
+                title="Bisherige Medikation" 
                 field="previousMedication" 
                 doctorsLetter={doctorsLetter} 
                 updateDoctorsLetter={updateDoctorsLetter} 
-                placeholder="Vormedikation auflisten..." 
+                placeholder="Bisherige Medikation auflisten..." 
               />
             </TabsContent>
             
@@ -323,11 +331,11 @@ const Index = () => {
             </TabsContent>
             <TabsContent value="lz-ekg">
               <TextSection
-                title="LZ-EKG"
+                title="6d- / 24-h-LZ-EKG"
                 field="lzEkg"
                 doctorsLetter={doctorsLetter}
                 updateDoctorsLetter={updateDoctorsLetter}
-                placeholder="LZ-EKG-Befund eintragen..."
+                placeholder="6d- / 24-h-LZ-EKG-Befund eintragen..."
               />
             </TabsContent>
 

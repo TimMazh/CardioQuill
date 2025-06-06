@@ -64,7 +64,7 @@ export function UploadPDFDialog({ onUpload, trigger, open: openProp, onOpenChang
         <DialogHeader>
           <DialogTitle>PDF hochladen</DialogTitle>
           <DialogDescription>
-            Wählen Sie eine PDF-Datei aus, um sie für die RAG-Verarbeitung hochzuladen.
+            Wählen Sie eine PDF-Datei aus, um sie für die RAG-Verarbeitung hochzuladen. Die Texte werden als Hilfsmittel zur Zusammenfassungsgenerierung verwendet.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

@@ -158,13 +158,33 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
     let pulmPressureOut = hasPulmPressure ? pulmPressureText : "Kein Hinweis für erhöhte pulmonale Drücke";
     let pericardEffusionOut = hasPericardEffusion ? pericardEffusionText : "Kein Perikarderguss";
     let pleuralEffusionOut = hasPleuralEffusion ? pleuralEffusionText : "Keine Pleuraergüsse";
+
+    let ivsdTextOut = ivsd === "" ? "" : `IVSd ${ivsd} mm. `;
+    let lveddTextOut = lvedd === "" ? "" : `LVEDd ${lvedd} mm. `;
+    let lvpwdTextOut = lvpwd === "" ? "" : `LVPWd ${lvpwd} mm. `;
+    let lvMassIndexTextOut = lvMassIndex === "" ? "" : `LV-Massenindex ${lvMassIndex} g/m2. `;
+    let rwtTextOut = rwt === "" ? "" : `RWT ${rwt}. `;
+    let lvefTextOut = lvef === "" ? "" : `LVEF ${lvef}%. `;
+    let glStrainTextOut = glStrain === "" ? "" : `GL Strain ${glStrain}%. `;
+    let aortenanulusTextOut = aortenanulus === "" ? "" : `Aortenanulus ${aortenanulus} mm. `;
+    let aortensinusTextOut = aortensinus === "" ? "" : `Aortensinus ${aortensinus} mm. `;
+    let aortaAscTextOut = aortaAsc === "" ? "" : `Aorta ascendens ${aortaAsc} mm. `;
+    let vmaxTextOut = vmax === "" ? "" : `Vmax ${vmax} m/s. `;
+    let dpMaxTextOut = dpMax === "" ? "" : `DP max ${dpMax} mmHg. `;
+    let dpMeanTextOut = dpMean === "" ? "" : `DP mean ${dpMean} mmHg. `;
+    let laviTextOut = lavi === "" ? "" : `LAVI ${lavi} ml/m2. `;
+    let raviTextOut = ravi === "" ? "" : `RAVI ${ravi} ml/m2. `;
+    let rvBasalTextOut = rvBasal === "" ? "" : `RV basal ${rvBasal} mm. `;
+    let tapseTextOut = tapse === "" ? "" : `TAPSE ${tapse} mm. `;
+    let eeTextOut = ee === "" ? "" : `E/E' ${ee}. `;
+
     let text =
-      `Linker Ventrikel ${lvTextOut}. IVSd ${ivsd} mm, LVEDd ${lvedd} mm, LVPWd ${lvpwd} mm, LV-Massenindex ${lvMassIndex} g/m2, RWT ${rwt}. ` +
-      `${lvSysTextOut}. LVEF ${lvef}%. GL Strain ${glStrain}%. Aortenanulus ${aortenanulus} mm, Aortensinus ${aortensinus} mm, Aorta ascendens ${aortaAsc} mm. ` +
-      `Rechter Ventrikel ${rvTextOut}. RV basal ${rvBasal} mm. ${rvSysTextOut}. TAPSE ${tapse} mm. ` +
-      `${atriaTextOut}. LAVI ${lavi} ml/m2, RAVI ${ravi} ml/m2. ${relaxationTextOut}. E/E' ${ee}. ` +
+      `Linker Ventrikel ${lvTextOut}. ${ivsdTextOut}${lveddTextOut}${lvpwdTextOut}${lvMassIndexTextOut}${rwtTextOut}${lvefTextOut}${glStrainTextOut}` +
+      `${lvSysTextOut}. ${aortenanulusTextOut}${aortensinusTextOut}${aortaAscTextOut}` +
+      `Rechter Ventrikel ${rvTextOut}. ${rvBasalTextOut}${rvSysTextOut}. ${tapseTextOut}` +
+      `${atriaTextOut}. ${laviTextOut}${raviTextOut}${relaxationTextOut}. ${eeTextOut}` +
       `${mitralValveOut} ${tricuspidValveOut} ${pulmonalValveOut} ${aorticValveOut} ` +
-      `${pulmPressureOut}. ${pericardEffusionOut}. ${pleuralEffusionOut}. Vmax ${vmax} m/s, DP max ${dpMax} mmHg, DP mean ${dpMean} mmHg.`;
+      `${pulmPressureOut}. ${pericardEffusionOut}. ${pleuralEffusionOut}. ${vmaxTextOut}${dpMaxTextOut}${dpMeanTextOut}`;
     if (transthoracicEchocardiographyAdditions.trim()) {
       text += `\nErgänzungen: ${transthoracicEchocardiographyAdditions.trim()}`;
     }
@@ -220,7 +240,7 @@ export function TransthoracicEchocardiographySection({ doctorsLetter, updateDoct
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Transthoracic Echocardiography</CardTitle>
+        <CardTitle>Transthorakale Echokardiographie</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Linker und Rechter Ventrikel nebeneinander */}

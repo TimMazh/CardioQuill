@@ -81,7 +81,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
   // Generate ECG analysis text
   const updateECGAnalysisText = () => {
     // Sinusrhythmus und Lagetyp
-    const sinus = sinusRate ? `Sinusrhythmus mit ${sinusRate}/Minute.` : "Sinusrhythmus.";
+    const sinus = sinusRate ? `Sinusrhythmus mit ${sinusRate}/Minute.` : "";
     let lage = `${lagetyp}.`;
     if (lagetyp == "Überdrehter Linkstyp") {
       lage = `Überdrehter Links Lagetyp.`;
@@ -102,8 +102,15 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     }
 
     // Intervalle
-    const intervals = `${pq ? `PQ ${pq}ms,` : ""} ${qrs ? `QRS ${qrs}ms,` : ""} ${qtc ? `QTc ${qtc}ms.` : ""}`;
+    let intervals = `${pq ? `PQ ${pq}ms,` : ""} ${qrs ? `QRS ${qrs}ms,` : ""} ${qtc ? `QTc ${qtc}ms.` : ""}`;
+    const parts = [];
+    if (pq)  parts.push(`PQ ${pq}ms`);
+    if (qrs) parts.push(`QRS ${qrs}ms`);
+    if (qtc) parts.push(`QTc ${qtc}ms`);
 
+    intervals = parts.join(", ");
+    if (intervals) intervals += ".";
+    
     // Pathologisches Q
     let qWaveText = "";
     if (hasPathologicalQ && qWaveLeads.length > 0) {
@@ -117,7 +124,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
     } else {
       qWaveText = "Kein pathologisches Q.";
     }
-
+    
     // ST-Veränderungen
     let stText = "";
     if (hasSTChanges && stChangesText) {
@@ -128,7 +135,7 @@ export function ECGAnalysisSection({ doctorsLetter, updateDoctorsLetter }: ECGAn
 
     // Regelrechte R-Progression
     let rProgressionText2 = "";
-    if (!(hasRegularRProgression && rProgressionText)) {
+    if (!(hasRegularRProgression && (rProgressionText == ""))) {
       rProgressionText2 = `${rProgressionText}.`;
     } else {
       rProgressionText2 = "Regelrechte R-Progression.";

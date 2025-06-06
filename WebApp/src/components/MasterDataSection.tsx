@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DoctorsLetter } from "@/lib/types";
+import { formatDate } from "@/lib/utils";
 
 interface MasterDataSectionProps {
   doctorsLetter: DoctorsLetter;
@@ -18,6 +19,17 @@ interface MasterDataSectionProps {
 }
 
 export function MasterDataSection({ doctorsLetter, updateDoctorsLetter }: MasterDataSectionProps) {
+  
+  useEffect(() => {
+    updateDoctorsLetter({
+      ...doctorsLetter,
+      patientControlDate: new Date().toISOString().slice(0, 10),
+      patientDateOfBirth: new Date().toISOString().slice(0, 10),
+      patientGender: "male",
+      doctorGender: "male",
+    });
+  }, []);
+
   const handleChange = (field: keyof DoctorsLetter, value: string) => {
     
     updateDoctorsLetter({ [field]: value });
@@ -44,7 +56,6 @@ export function MasterDataSection({ doctorsLetter, updateDoctorsLetter }: Master
                 <SelectContent>
                   <SelectItem value="male">Männlich</SelectItem>
                   <SelectItem value="female">Weiblich</SelectItem>
-                  <SelectItem value="diverse">Divers</SelectItem>
                 </SelectContent>
               </Select>
             <div className="grid grid-cols-2 gap-4">
@@ -73,7 +84,7 @@ export function MasterDataSection({ doctorsLetter, updateDoctorsLetter }: Master
               <Input 
                 id="patientDateOfBirth"
                 type="date"
-                value={doctorsLetter.patientDateOfBirth || ""}
+                value={doctorsLetter.patientDateOfBirth || formatDate(new Date().toISOString())}  
                 onChange={(e) => handleChange("patientDateOfBirth", e.target.value)}
               />
             </div>
@@ -92,7 +103,7 @@ export function MasterDataSection({ doctorsLetter, updateDoctorsLetter }: Master
               <Input 
                 id="patientControlDate"
                 type="date"
-                value={doctorsLetter.patientControlDate || ""}
+                value={doctorsLetter.patientControlDate || formatDate(new Date().toISOString())}
                 onChange={(e) => handleChange("patientControlDate", e.target.value)}
               />
             </div>
@@ -115,7 +126,6 @@ export function MasterDataSection({ doctorsLetter, updateDoctorsLetter }: Master
                   <SelectContent>
                     <SelectItem value="male">Männlich</SelectItem>
                     <SelectItem value="female">Weiblich</SelectItem>
-                    <SelectItem value="diverse">Divers</SelectItem>
                   </SelectContent>
                 </Select>
                 </div>

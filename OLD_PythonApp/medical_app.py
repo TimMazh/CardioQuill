@@ -24,10 +24,10 @@ from GUI.previous_medication import PreviousMedicationSection
 from GUI.physical_examination_section import PhysicalExaminationSection
 from GUI.ecg_analysis_section import ECGAnalysisSection
 
-class CardioVistaApp:
+class CardioQuillApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("CardioVista - Medical Scribe")
+        self.root.title("CardioQuill - Medical Scribe")
         self.root.geometry("1440x790")
         self.root.resizable(False, False)
 
@@ -513,7 +513,7 @@ if __name__ == "__main__":
         print("Starting with basic theme...")
     
     root = tk.Tk()
-    app = CardioVistaApp(root)
+    app = CardioQuillApp(root)
     
     # Apply sv_ttk theme if available
     if has_sv_ttk:

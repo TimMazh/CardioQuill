@@ -67,10 +67,17 @@ export function PhysicalExaminationSection({
       examinationText += `Körpergrösse ${height} cm, Körpergewicht ${weight} kg, BMI ${bmi} kg/m². `;
     }
     
+    
+
+    if (bpLeftSys && bpLeftDia){
+      examinationText += `Blutdruck in Ruhe links ${bpLeftSys}/${bpLeftDia} mmHg. `;
+    }
+    if (bpRightSys && bpRightDia){
+      examinationText += `Blutdruck in Ruhe rechts ${bpRightSys}/${bpRightDia} mmHg. `;
+    }
     // Blood pressure
     if (bpLeftSys && bpLeftDia && bpRightSys && bpRightDia) {
-      examinationText += `Blutdruck in Ruhe links ${bpLeftSys}/${bpLeftDia} mmHg, rechts ${bpRightSys}/${bpRightDia} mmHg. `;
-      
+      examinationText += `Blutdruck in Ruhe links ${bpLeftSys}/${bpLeftDia} mmHg. Blutdruck in Ruhe rechts ${bpRightSys}/${bpRightDia} mmHg. `;
       // Side difference
       if (hasBPSideDifference) {
         const sysDiff = Math.abs(parseInt(bpLeftSys) - parseInt(bpRightSys));
@@ -83,6 +90,7 @@ export function PhysicalExaminationSection({
         examinationText += `Keine Seitendifferenz. `;
       }
     }
+    
     
     // Pulse
     if (pulse) {
