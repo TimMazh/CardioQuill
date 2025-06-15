@@ -134,26 +134,35 @@ const Index = () => {
     }, 2000);
   };
   
-  // Upload PDF
-  const handleUploadPDF = async (file?: File) => {
-    if (!file) {
+  // Upload PDF(s)
+  const handleUploadPDF = async (files: File[]) => {
+    if (!files || files.length === 0) {
       setPdfDialogOpen(true);
       return;
     }
     setAppStatus("processing");
-    const success = await uploadAndProcessPdf(file);
-    if (!success) {
-      toast({
-        title: "PDF-Verarbeitung fehlgeschlagen",
-        description: `Die Datei "${file.name}" konnte nicht verarbeitet werden.`,
-        variant: "destructive",
-      });
+    let allSuccess = true;
+    for (const file of files) {
+      const success = await uploadAndProcessPdf(file);
+      if (!success) {
+        allSuccess = false;
+        toast({
+          title: "PDF-Verarbeitung fehlgeschlagen",
+          description: `Die Datei "${file.name}" konnte nicht verarbeitet werden.`,
+          variant: "destructive",
+        });
+      }
     }
     setAppStatus("ready");
     setPdfDialogOpen(false);
-    
+    if (allSuccess) {
+      toast({
+        title: "Alle PDFs verarbeitet",
+        description: "Alle ausgewählten PDF-Dateien wurden verarbeitet.",
+      });
+    }
   };
-  
+
   // Clear all fields
   const handleClearFields = () => {
     setDoctorsLetter({});

@@ -15,44 +15,50 @@ import { serverService } from "@/services/ServerService";
 import { toast } from "@/components/ui/use-toast";  
 
 interface UploadPDFDialogProps {
-  onUpload: (file: File) => void;
+  onUpload: (files: File[]) => void;
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
 export function UploadPDFDialog({ onUpload, trigger, open: openProp, onOpenChange }: UploadPDFDialogProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [localOpen, setLocalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const dialogOpen = openProp !== undefined ? openProp : localOpen;
   const handleOpenChange = (next: boolean) => onOpenChange ? onOpenChange(next) : setLocalOpen(next);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFiles(Array.from(e.target.files));
+    } else {
+      setSelectedFiles([]);
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || uploading) return;
+    if (!selectedFiles.length || uploading) return;
     setUploading(true);
-    const result = await serverService.processPdf(selectedFile);
-
-    if (result) {
+    let allSuccess = true;
+    for (const file of selectedFiles) {
+      const result = await serverService.processPdf(file);
+      if (!result) {
+        allSuccess = false;
+        toast({
+          title: `Fehler beim Verarbeiten von ${file.name}`,
+          description: typeof result === 'string' ? result : undefined,
+          variant: "destructive",
+        });
+      }
+    }
+    if (allSuccess) {
       toast({
-        title: "PDF erfolgreich verarbeitet",
-        description: "Der PDF-Upload wurde erfolgreich verarbeitet.",
+        title: "Alle PDFs erfolgreich verarbeitet",
+        description: "Alle PDF-Uploads wurden erfolgreich verarbeitet.",
       });
-      onUpload(selectedFile);
-      setSelectedFile(null);
+      onUpload(selectedFiles);
+      setSelectedFiles([]);
       handleOpenChange(false);
-    } else {
-      toast({
-        title: "Fehler beim Verarbeiten des PDF",
-        description: result,
-        variant: "destructive",
-      });
     }
     setUploading(false);
   };
@@ -74,6 +80,7 @@ export function UploadPDFDialog({ onUpload, trigger, open: openProp, onOpenChang
               id="pdf-file"
               type="file"
               accept=".pdf"
+              multiple
               onChange={handleFileChange}
             />
           </div>
@@ -82,9 +89,9 @@ export function UploadPDFDialog({ onUpload, trigger, open: openProp, onOpenChang
           <Button
             type="submit"
             onClick={handleUpload}
-            disabled={!selectedFile || uploading}
+            disabled={!selectedFiles.length || uploading}
           >
-            {uploading ? "Lädt..." : "Hochladen"}
+            {uploading ? "Lädt..." : `Hochladen (${selectedFiles.length})`}
           </Button>
         </DialogFooter>
       </DialogContent>

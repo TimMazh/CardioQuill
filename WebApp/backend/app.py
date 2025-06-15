@@ -357,49 +357,52 @@ def poll_response_endpoint():
 
 @app.route('/process-pdf', methods=['POST'])
 def process_pdf_endpoint():
-    """Process a PDF file for RAG"""
+    """Process multiple PDF files for RAG"""
     try:
-        if 'file' not in request.files:
-            return jsonify({"success": False, "message": "No file provided"})
-        
-        file = request.files['file']
+        # Accept both 'file' (single) and 'files' (multiple)
+        files = request.files.getlist('files')
+        if not files or files == [None] or (len(files) == 1 and files[0].filename == ''):
+            # Fallback: try single file for backward compatibility
+            single_file = request.files.get('file')
+            if not single_file or single_file.filename == '':
+                return jsonify({"success": False, "message": "No files provided"})
+            files = [single_file]
 
-        if file.filename == '':
-            return jsonify({"success": False, "message": "No file selected"})
-        
-        # Save uploaded file temporarily
         temp_dir = tempfile.gettempdir()
-        temp_file_path = os.path.join(temp_dir, file.filename)
-        file.save(temp_file_path)
-    
-        
-        # Process the PDF
+        results = []
         ssh_client = get_ssh_connection()
-        
         if not ssh_client:
             return jsonify({
                 "success": False,
                 "message": "Failed to establish SSH connection"
             })
-        
         # Make sure server is running
         server_started = start_server(ssh_client)
-        
         if not server_started:
             return jsonify({
                 "success": False,
                 "message": "Failed to start LLM server"
             })
-        
-        # Process the PDF
-        result = process_pdf(ssh_client, temp_file_path)
-        
-        # Clean up
-        os.remove(temp_file_path)
-        
-        return jsonify(result)
+        for file in files:
+            if not file or file.filename == '':
+                results.append({"success": False, "message": "Empty or invalid file", "filename": getattr(file, 'filename', None)})
+                continue
+            temp_file_path = os.path.join(temp_dir, file.filename)
+            file.save(temp_file_path)
+            try:
+                result = process_pdf(ssh_client, temp_file_path)
+                result["filename"] = file.filename
+            except Exception as e:
+                result = {"success": False, "message": f"Error processing {file.filename}: {str(e)}", "filename": file.filename}
+            finally:
+                try:
+                    os.remove(temp_file_path)
+                except Exception:
+                    pass
+            results.append(result)
+        return jsonify({"results": results, "success": all(r.get("success") for r in results)})
     except Exception as e:
-        return jsonify({"success": False, "message": f"Error processing PDF: {str(e)}"})
+        return jsonify({"success": False, "message": f"Error processing PDFs: {str(e)}"})
 
 # Add an error handler for all exceptions
 @app.errorhandler(Exception)

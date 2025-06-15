@@ -7,7 +7,7 @@ import { UploadPDFDialog } from "@/components/UploadPDFDialog";
 import { FileUp } from "lucide-react";
 
 interface ControlPanelProps {
-  onUploadPDF: (file: File) => void;
+  onUploadPDF: (files: File[]) => void;
   onClearFields: () => void;
   ragEnabled: boolean;
   onToggleRAG: () => void;
