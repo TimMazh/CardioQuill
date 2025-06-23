@@ -23,3 +23,5 @@ Um die Applikation laufen zu lassen, ist zunächst via Konsole in den Ordner "/W
 Anschliessend ist in den Ordner "/WebApp" zu navigieren, in welchem der Befehl "npm run dev" in einener separaten Konsoleninstanz auszuführen ist. 
 
 Dies lässt schliesslich die Applikation via localhost erreichbar machen
+
+Nach dem Starten der Applikation wird ein Skript auf dem DGX-2 ausgeführt, welches das Modell initialisiert. Wichtig zu beachten ist, dass wenn die Applikation heruntergefahren wird, zwingend via SSH auf den DGX-2 zugegriffen werden muss und der Befehl "apptainer instance stop llm_instance" ausgeführt werden muss, um die Rechenleistung wieder freizugeben.
