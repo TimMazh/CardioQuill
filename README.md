@@ -7,6 +7,8 @@ Folgend einige Hinweise für zukünftige Entwickler, welche bei der Erweiterung 
 ## Rechenleistung / ICAI
 Das lokal installierte LLM wird auf einem NVIDIA DGX-2 der Ostschweizer Fachhochschule, welcher von dem Interdisciplinary Center for Artificial Intelligence (ICAI) der OST betrieben wird. 
 
+Da der DGX-2 ein geteiler Rechner ist, werden nur 3 von 16 verfügbaren Grafikkarten verwendet.
+
 Da keine Administratoren-Rechte für Entwickler auf dem DGX-2 bestehen, wird die Verbindung via SSH gemacht. Die Logindaten und Pfade sind in dem Dokument serverconfig.json anzupassen. 
 
 Dazu bedarf es ein Login für den DGX-2, welches der zukünftige Entwickler beim ICAI anzufragen hat. 
